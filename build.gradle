@@ -1,0 +1,24 @@
+apply plugin: 'scala'
+apply plugin: 'war'
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+version = '1.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://repo.springsource.org/milestone"
+    }
+}
+
+dependencies {
+    compile 'org.freemarker:freemarker:2.3.20';
+    compile 'org.springframework:spring-webmvc:3.2.3.RELEASE'
+    compile 'org.springframework:spring-context-support:3.2.3.RELEASE'
+    compile 'org.springframework.scala:spring-scala_2.10:1.0.0.RC1'
+    compile 'org.scala-lang:scala-library:2.11.1'
+    compile 'javax.servlet:servlet-api:2.5'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
