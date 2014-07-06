@@ -1,0 +1,21 @@
+{
+    "rootNode": {
+        /* первый и последний слеш будет проигнорирован */
+        "urlPrefix": "start/f",
+        "view": "start_folder.ftl",
+        "nodes": [
+            {
+                "urlPrefix": "not_index.html",
+                "view": "/not_index.ftl"
+            },
+            {
+                "urlPrefix": "child",
+                "nodes": [
+                    {
+                        "urlPrefix": "index.html"
+                    }
+                ]
+            }
+        ]
+    }
+}
