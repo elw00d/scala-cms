@@ -8,9 +8,8 @@ import com.google.gson.Gson
 import scala.io.{BufferedSource, Source}
 
 /**
- * User: igor.kostromin
- * Date: 05.07.2014
- * Time: 11:30
+ * @author igor.kostromin
+ *         05.07.2014 11:30
  */
 @WebListener
 class WebAppInitializer extends javax.servlet.ServletContextListener {

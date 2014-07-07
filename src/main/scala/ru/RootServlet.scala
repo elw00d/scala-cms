@@ -15,9 +15,8 @@ import com.google.gson.Gson
 import scala.io.{Source, BufferedSource}
 
 /**
- * User: igor.kostromin
- * Date: 28.06.2014
- * Time: 10:55
+ * @author igor.kostromin
+ *         28.06.2014 10:55
  */
 @WebServlet(value=Array("/"), name = "rootServlet")
 class RootServlet extends HttpServlet {
@@ -95,7 +94,9 @@ class RootServlet extends HttpServlet {
 
           val ftlTemplate = cfg.getTemplate(view)
           val dataContext = new util.HashMap[String, Any]
-          dataContext.put("region", new RegionDirective())
+          dataContext.put("region", new RegionDirective)
+          dataContext.put("module", new ModuleDirective)
+          dataContext.put("cmsConfig", cmsConfig)
 
           regions.foreach((tuple: (String, String)) => dataContext.put(
             "region_" + tuple._1, cfg.getTemplate(tuple._2)
