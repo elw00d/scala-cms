@@ -7,7 +7,8 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 import freemarker.cache.FileTemplateLoader
 import freemarker.template.Configuration
 
-import scala.util.control.Breaks._
+import scala.collection.mutable
+import scala.collection.JavaConversions._
 
 import com.google.gson.Gson
 
@@ -53,7 +54,7 @@ class RootServlet extends HttpServlet {
   }
 
   override def service(req: HttpServletRequest, resp: HttpServletResponse) = {
-    val file: BufferedSource = Source.fromFile("D:\\elwood\\my-repos\\scala-cms\\scala-cms\\cms\\config.json")
+    val file: BufferedSource = Source.fromFile("d:\\all\\scala\\webapp\\cms\\config_v2.json")
     val content: String = file.mkString
     val gson: Gson = new Gson()
     val cmsConfig: CmsConfig = gson.fromJson(content, classOf[CmsConfig] )
@@ -68,15 +69,41 @@ class RootServlet extends HttpServlet {
         if (matchNode == null || matchNode.template == null) {
           response.getWriter.print("Not found")
         } else {
-          val templateLoader = new FileTemplateLoader(new File("D:\\elwood\\my-repos\\scala-cms\\scala-cms\\cms\\views"))
+          val templateLoader = new FileTemplateLoader(new File("d:\\all\\scala\\webapp\\cms\\views"))
           val cfg = new Configuration()
           cfg.setTemplateLoader(templateLoader)
-          val template = cfg.getTemplate(matchNode.template)
+
+          def getRootView(templateId: String, regionsMap: mutable.HashMap[String, String]) : String = {
+            var currentTemplate = cmsConfig.getTemplateById(templateId)
+            // Если шаблона с таким именем нет, считаем, что это и есть view
+            if (currentTemplate == null) return templateId
+            while (currentTemplate.baseTemplate != null){
+              // Если есть какие-то регионы в текущем определении шаблона,
+              // добавляем их в общий словарь
+              if (currentTemplate.regions != null){
+                currentTemplate.regions.foreach((tuple: (String, String)) => {
+                  regionsMap.put(tuple._1, getRootView(tuple._2, regionsMap))
+                })
+              }
+              currentTemplate = cmsConfig.getTemplateById(currentTemplate.baseTemplate)
+            }
+            currentTemplate.view
+          }
+
+          var regions = new mutable.HashMap[String, String]()
+          val view = getRootView(matchNode.template, regions)
+
+          val ftlTemplate = cfg.getTemplate(view)
           val dataContext = new util.HashMap[String, Any]
           dataContext.put("region", new RegionDirective())
-          dataContext.put("someVar", "SomeVariableContent")
+
+          regions.foreach((tuple: (String, String)) => dataContext.put(
+            "region_" + tuple._1, cfg.getTemplate(tuple._2)
+          ))
+
+          //dataContext.put("someVar", "SomeVariableContent")
           //dataContext.put("region_main", "MyRegionContent ${someVar}")
-          template.process(dataContext, response.getWriter)
+          ftlTemplate.process(dataContext, response.getWriter)
         }
       }
       case _ => (request: HttpServletRequest, response: HttpServletResponse) => {

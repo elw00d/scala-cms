@@ -3,6 +3,7 @@ package ru
 import java.util
 
 import freemarker.core.Environment
+import freemarker.ext.beans.StringModel
 import freemarker.template
 import freemarker.template._
 
@@ -20,7 +21,8 @@ class RegionDirective extends TemplateDirectiveModel {
     if (regionContentTemplateModel == null) {
       body.render(env.getOut)
     } else {
-      val regionContent = regionContentTemplateModel.asInstanceOf[SimpleScalar].getAsString
+      //val regionContent = regionContentTemplateModel.asInstanceOf[SimpleScalar].getAsString
+      val regionContent = regionContentTemplateModel.asInstanceOf[StringModel].getAsString
       val f: freemarker.template.Template = new template.Template("someName", regionContent, env.getConfiguration)
       f.process(env.getDataModel, env.getOut)
     }

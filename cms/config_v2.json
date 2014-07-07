@@ -29,7 +29,7 @@
             "regions": {
                 /* Это не ftl view, а ссылка на шаблон */
                 "body": "inner-master-page",
-                "innerBody": "some-body.ftl",
+                "innerMain": "some-body.ftl",
                 "footer": "concrete-footer.ftl"
             }
         }
