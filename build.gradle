@@ -6,6 +6,10 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 version = '1.0'
 
+gretty {
+  port = 8081
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -14,6 +18,7 @@ repositories {
 }
 
 dependencies {
+    //scalaTools "org.scala-lang:scala-compiler:2.11.1"
     compile 'org.freemarker:freemarker:2.3.20';
 //    compile 'org.springframework:spring-webmvc:3.2.3.RELEASE'
 //    compile 'org.springframework:spring-context-support:3.2.3.RELEASE'
