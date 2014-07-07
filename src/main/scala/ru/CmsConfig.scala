@@ -4,12 +4,12 @@ import scala.beans.BeanProperty
 import scala.collection.immutable.HashMap
 
 /**
- * User: igor.kostromin
- * Date: 05.07.2014
- * Time: 19:23
+ * @author igor.kostromin
+ *         05.07.2014 19:23
  */
 class CmsConfig(@BeanProperty var rootNode: Node,
-                 @BeanProperty var templates: Array[Template]) {
+                 @BeanProperty var templates: Array[Template],
+                 @BeanProperty var modules: java.util.HashMap[String, String]) {
   private var map: collection.mutable.HashMap[String,Template] = null
 
   // todo : do this in ctor
