@@ -18,7 +18,7 @@ class CmsConfig(@BeanProperty var rootNode: Node,
       map = new collection.mutable.HashMap[String, Template]
       this.templates.foreach(tmpl => map.put(tmpl.id, tmpl))
     }
-    map.get(id).get
+    map.get(id).orNull
   }
 }
 
@@ -30,5 +30,5 @@ class Node(@BeanProperty var urlPrefix: String,
 class Template(@BeanProperty var id: String,
                 @BeanProperty var view: String,
                 @BeanProperty var baseTemplate: String,
-                @BeanProperty var regions: Map[String, String]) {
+                @BeanProperty var regions: java.util.HashMap[String, String]) {
 }
