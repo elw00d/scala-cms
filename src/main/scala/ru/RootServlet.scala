@@ -65,13 +65,13 @@ class RootServlet extends HttpServlet {
     val method: String = req.getMethod
     val handler = method match {
       case "GET" => (request: HttpServletRequest, response: HttpServletResponse) => {
-        if (matchNode == null || matchNode.view == null) {
+        if (matchNode == null || matchNode.template == null) {
           response.getWriter.print("Not found")
         } else {
           val templateLoader = new FileTemplateLoader(new File("D:\\elwood\\my-repos\\scala-cms\\scala-cms\\cms\\views"))
           val cfg = new Configuration()
           cfg.setTemplateLoader(templateLoader)
-          val template = cfg.getTemplate(matchNode.view)
+          val template = cfg.getTemplate(matchNode.template)
           val dataContext = new util.HashMap[String, Any]
           dataContext.put("region", new RegionDirective())
           dataContext.put("someVar", "SomeVariableContent")

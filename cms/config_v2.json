@@ -47,7 +47,8 @@
                 "urlPrefix": "child",
                 "nodes": [
                     {
-                        "urlPrefix": "index.html"
+                        "urlPrefix": "index.html",
+                        "template": "concrete-view2"
                     }
                 ]
             }
