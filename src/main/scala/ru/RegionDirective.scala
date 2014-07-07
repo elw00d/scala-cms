@@ -14,11 +14,14 @@ class RegionDirective extends TemplateDirectiveModel {
                        params: util.Map[_, _],
                        loopVars: Array[TemplateModel],
                        body: TemplateDirectiveBody): Unit = {
-    // Можно сделать что по умолчанию (если нет содержимого для региона) рендерится то, что
-    // внутри директивы region
+    // По умолчанию (если содержимое для региона не задано) рендерится то, что внутри директивы region
     val regionContentTemplateModel: TemplateModel = env.getDataModel.get("region_" + params.get("id"))
-    val regionContent = regionContentTemplateModel.asInstanceOf[SimpleScalar].getAsString
-    val f: Template = new Template("someName", regionContent, env.getConfiguration)
-    f.process(env.getDataModel, env.getOut)
+    if (regionContentTemplateModel == null) {
+      body.render(env.getOut)
+    } else {
+      val regionContent = regionContentTemplateModel.asInstanceOf[SimpleScalar].getAsString
+      val f: Template = new Template("someName", regionContent, env.getConfiguration)
+      f.process(env.getDataModel, env.getOut)
+    }
   }
 }
