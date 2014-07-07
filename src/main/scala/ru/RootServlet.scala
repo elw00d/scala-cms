@@ -53,7 +53,7 @@ class RootServlet extends HttpServlet {
   }
 
   override def service(req: HttpServletRequest, resp: HttpServletResponse) = {
-    val file: BufferedSource = Source.fromFile("d:\\all\\scala\\webapp\\cms\\config.json")
+    val file: BufferedSource = Source.fromFile("D:\\elwood\\my-repos\\scala-cms\\scala-cms\\cms\\config.json")
     val content: String = file.mkString
     val gson: Gson = new Gson()
     val cmsConfig: CmsConfig = gson.fromJson(content, classOf[CmsConfig] )
@@ -68,11 +68,14 @@ class RootServlet extends HttpServlet {
         if (matchNode == null || matchNode.view == null) {
           response.getWriter.print("Not found")
         } else {
-          val templateLoader = new FileTemplateLoader(new File("d:\\all\\scala\\webapp\\cms\\views"))
+          val templateLoader = new FileTemplateLoader(new File("D:\\elwood\\my-repos\\scala-cms\\scala-cms\\cms\\views"))
           var cfg = new Configuration()
           cfg.setTemplateLoader(templateLoader)
           var template = cfg.getTemplate(matchNode.view)
           val dataContext = new util.HashMap[String, Any]
+          dataContext.put("region", new RegionDirective())
+          dataContext.put("someVar", "SomeVariableContent")
+          dataContext.put("region_main", "MyRegionContent ${someVar}")
           template.process(dataContext, response.getWriter)
         }
       }
