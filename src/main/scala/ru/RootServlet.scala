@@ -69,13 +69,13 @@ class RootServlet extends HttpServlet {
           response.getWriter.print("Not found")
         } else {
           val templateLoader = new FileTemplateLoader(new File("D:\\elwood\\my-repos\\scala-cms\\scala-cms\\cms\\views"))
-          var cfg = new Configuration()
+          val cfg = new Configuration()
           cfg.setTemplateLoader(templateLoader)
-          var template = cfg.getTemplate(matchNode.view)
+          val template = cfg.getTemplate(matchNode.view)
           val dataContext = new util.HashMap[String, Any]
           dataContext.put("region", new RegionDirective())
           dataContext.put("someVar", "SomeVariableContent")
-          dataContext.put("region_main", "MyRegionContent ${someVar}")
+          //dataContext.put("region_main", "MyRegionContent ${someVar}")
           template.process(dataContext, response.getWriter)
         }
       }

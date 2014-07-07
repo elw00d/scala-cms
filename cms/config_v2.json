@@ -1,0 +1,56 @@
+{
+    "templates": [
+        {
+            "id": "master-page",
+            "view": "master-page.ftl"
+        },
+        {
+            "id": "master-page-child",
+            "baseTemplate": "master-page",
+            "regions": {
+                "header": "child_header.ftl"
+            }
+        },
+        {
+            "id": "concrete-view",
+            "baseTemplate": "master-page-child",
+            "regions": {
+                "body": "concrete-body.ftl",
+                "footer": "concrete-footer.ftl"
+            }
+        },
+        {
+            "id": "inner-master-page",
+            "view": "inner-master-page.ftl"
+        },
+        {
+            "id": "concrete-view2",
+            "baseTemplate": "master-page-child",
+            "regions": {
+                /* Это не ftl view, а ссылка на шаблон */
+                "body": "inner-master-page",
+                "innerBody": "some-body.ftl",
+                "footer": "concrete-footer.ftl"
+            }
+        }
+    ],
+    "rootNode": {
+        /* первый и последний слеш будет проигнорирован */
+        "urlPrefix": "start/f",
+        "template": "master-page",
+        "nodes": [
+            {
+                "urlPrefix": "not_index.html",
+                "template": "concrete-view"
+            },
+            {
+                "urlPrefix": "child",
+                "nodes": [
+                    {
+                        "urlPrefix": "index.html"
+                    }
+                ]
+            }
+        ]
+    }
+}
