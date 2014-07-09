@@ -40,30 +40,31 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">Project name</a>
+          <a class="brand" href="${baseUrl}/">Console Framework</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li class="active"><a href="#">Home</a></li>
-              <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
+              <li class="active"><a href="${baseUrl}/">Home</a></li>
+              <li><a href="${baseUrl}/downloads">Downloads</a></li>
+              <li><a href="${baseUrl}/sources">Source code</a></li>
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Docs <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li><a href="#">Action</a></li>
-                  <li><a href="#">Another action</a></li>
-                  <li><a href="#">Something else here</a></li>
+                  <li><a href="#">Getting started</a></li>
+                  <li><a href="#">Building from sources</a></li>
+                  <li><a href="#">Examples</a></li>
                   <li class="divider"></li>
-                  <li class="nav-header">Nav header</li>
-                  <li><a href="#">Separated link</a></li>
-                  <li><a href="#">One more separated link</a></li>
+                  <li><a href="#">XAML reference</a></li>
+                  <li><a href="#">Data binding reference</a></li>
+                  <li><a href="#">Layout system reference</a></li>
+                  <li><a href="#">Writing custom controls</a></li>
                 </ul>
               </li>
             </ul>
-            <form class="navbar-form pull-right">
+            <#--<form class="navbar-form pull-right">
               <input class="span2" type="text" placeholder="Email">
               <input class="span2" type="password" placeholder="Password">
               <button type="submit" class="btn">Sign in</button>
-            </form>
+            </form>-->
           </div><!--/.nav-collapse -->
         </div>
       </div>
@@ -73,26 +74,46 @@
 
       <!-- Main hero unit for a primary marketing message or call to action -->
       <div class="hero-unit">
-        <h1>Hello, world!</h1>
-        <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
+        <h1>Console Framework</h1>
+        <p>Console framework is cross-platform toolkit that allows to develop TUI applications using C# and based on WPF-like concepts.</p>
         <p><a href="#" class="btn btn-primary btn-large">Learn more</a></p>
       </div>
 
       <!-- Example row of columns -->
       <div class="row">
         <div class="span4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+          <h2>Declarative markup</h2>
+          <p>XAML support allows to design UI using the most productive way.</p>
           <p><a class="btn" href="#">View details</a></p>
         </div>
         <div class="span4">
-          <h2>Heading</h2>
-          <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+          <h2>Data binding</h2>
+          <p>No boilerplate code! Define your bindings in XAML markup directly.</p>
           <p><a class="btn" href="#">View details</a></p>
        </div>
         <div class="span4">
-          <h2>Heading</h2>
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+          <h2>Retained mode rendering system</h2>
+          <p>Solid rendering system is integrated into events loop. Routed events system is similar to WPF too.</p>
+          <p><a class="btn" href="#">View details</a></p>
+        </div>
+      </div>
+
+        <div class="row">
+        <div class="span4">
+          <h2>WPF-compatible layout system</h2>
+          <p>Simple and flexible layout system with panels and end-controls. You can use standard
+          components or easily write custom one. <#--Each component is measured and arranged using WPF-compatible
+          layout protocol, so you can use your experience in WPF to write your custom controls.--></p>
+          <p><a class="btn" href="#">View details</a></p>
+        </div>
+        <div class="span4">
+          <h2>A lot of controls available</h2>
+          <p>For example: Grid, ScrollViewer, ListBox, ComboBox, TreeView</p>
+          <p><a class="btn" href="#">View details</a></p>
+       </div>
+        <div class="span4">
+          <h2>Crossplatform</h2>
+          <p>Windows, Mac OS X and any Linux (32-bit or 64-bit) support</p>
           <p><a class="btn" href="#">View details</a></p>
         </div>
       </div>
@@ -100,7 +121,7 @@
       <hr>
 
       <footer>
-        <p>&copy; Company 2013</p>
+        <p>&copy; elwood 2013</p>
       </footer>
 
     </div> <!-- /container -->
@@ -108,6 +129,7 @@
     <!-- Le javascript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+    <script src="${baseUrl}/static/index.js"></script>
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="${baseUrl}/static/bootstrap/js/bootstrap.js"></script>
     <#--<script src="../assets/js/bootstrap-transition.js"></script>
