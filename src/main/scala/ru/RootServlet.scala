@@ -1,7 +1,8 @@
 package ru
 
-import java.io.File
+import java.io.{FileInputStream, File}
 import java.util
+import javax.servlet.ServletOutputStream
 import javax.servlet.annotation.WebServlet
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 import freemarker.cache.FileTemplateLoader
@@ -52,12 +53,69 @@ class RootServlet extends HttpServlet {
     bestMatch
   }
 
-  override def service(req: HttpServletRequest, resp: HttpServletResponse) = {
+  class Loan[A <: AutoCloseable](resource: A) {
+    def to[B](block: A => B) = {
+      var t: Throwable = null
+      try {
+        block(resource)
+      } catch {
+        case x => t = x; throw x
+      } finally {
+        if (resource != null) {
+          if (t != null) {
+            try {
+              resource.close()
+            } catch {
+              case y => t.addSuppressed(y)
+            }
+          } else {
+            resource.close()
+          }
+        }
+      }
+    }
+  }
+
+  object Loan {
+    def loan[A <: AutoCloseable](resource: A) = new Loan(resource)
+  }
+
+  import Loan._
+
+  // todo : cache (return 304 NOT MODIFIED)
+  def downloadStatic(response: HttpServletResponse, path: String) = {
+    val basedir: String = System.getProperty("cms.basedir")
+    val file = new File(basedir, path)
+    if(file.exists() && !file.isDirectory) {
+      loan(response.getOutputStream).to((ostream: ServletOutputStream) => {
+        val helper: MimeTypesHelper = new MimeTypesHelper()
+        response.setContentType(helper.getMimeTypeForExtension(helper.extractExtension(file.getName)))
+        response.setContentLength(file.length().asInstanceOf[Int])
+        loan(new FileInputStream(file)).to((istream: FileInputStream) => {
+          val buffer = new Array[Byte](64 * 1024)
+          var readed = istream.read(buffer)
+          while ( readed != -1) {
+            ostream.write(buffer, 0, readed)
+            readed = istream.read(buffer)
+          }
+        })
+      })
+    } else {
+      response.setStatus(404)
+    }
+  }
+
+  override def service(req: HttpServletRequest, resp: HttpServletResponse):Unit = {
     val basedir: String = System.getProperty("cms.basedir")
     val file: BufferedSource = Source.fromFile(new File(basedir, "config_v2.json"))
     val content: String = file.mkString
     val gson: Gson = new Gson()
     val cmsConfig: CmsConfig = gson.fromJson(content, classOf[CmsConfig] )
+
+    if (req.getServletPath.startsWith("/static/")){
+      downloadStatic(resp, req.getServletPath)
+      return
+    }
 
     // Get best match node
     System.out.println("Path: " + req.getServletPath)
@@ -98,6 +156,7 @@ class RootServlet extends HttpServlet {
           dataContext.put("region", new RegionDirective)
           dataContext.put("module", new ModuleDirective)
           dataContext.put("cmsContext", new CmsContext(cmsConfig, matchNode, templateLoader, dataContext))
+          dataContext.put("baseUrl", "/webapp")
 
           regions.foreach((tuple: (String, String)) => dataContext.put(
             "region_" + tuple._1, cfg.getTemplate(tuple._2)

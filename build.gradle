@@ -15,7 +15,7 @@ def grettyConfig = [
 if (ext.profile == 'dev') {
   grettyConfig.jvmArgs.add('-Dcms.basedir=d:\\all\\scala\\webapp\\cms')
 } else if (ext.profile == 'dev2') {
-  grettyConfig.jvmArgs.add('-Dcms.basedir=d:\\elwood\\my-repos\\scala-cms\\scala-cms\\cms')
+  grettyConfig.jvmArgs.add('-Dcms.basedir=d:\\elwood\\my-repos\\scala-cms\\scala-cms\\consoleframework')
 }
 
 gretty {
