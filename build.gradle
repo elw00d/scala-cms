@@ -6,8 +6,21 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 version = '1.0'
 
+ext.profile = project.property('profile');
+
+def grettyConfig = [
+  jvmArgs: []
+];
+
+if (ext.profile == 'dev') {
+  grettyConfig.jvmArgs.add('-Dcms.basedir=d:\\all\\scala\\webapp\\cms')
+} else if (ext.profile == 'dev2') {
+  grettyConfig.jvmArgs.add('-Dcms.basedir=d:\\elwood\\my-repos\\scala-cms\\scala-cms\\cms')
+}
+
 gretty {
   port = 8081
+  jvmArgs = grettyConfig.jvmArgs
 }
 
 repositories {

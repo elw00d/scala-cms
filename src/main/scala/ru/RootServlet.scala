@@ -53,7 +53,8 @@ class RootServlet extends HttpServlet {
   }
 
   override def service(req: HttpServletRequest, resp: HttpServletResponse) = {
-    val file: BufferedSource = Source.fromFile("d:\\all\\scala\\webapp\\cms\\config_v2.json")
+    val basedir: String = System.getProperty("cms.basedir")
+    val file: BufferedSource = Source.fromFile(new File(basedir, "config_v2.json"))
     val content: String = file.mkString
     val gson: Gson = new Gson()
     val cmsConfig: CmsConfig = gson.fromJson(content, classOf[CmsConfig] )
@@ -68,7 +69,7 @@ class RootServlet extends HttpServlet {
         if (matchNode == null || matchNode.template == null) {
           response.getWriter.print("Not found")
         } else {
-          val templateLoader = new FileTemplateLoader(new File("d:\\all\\scala\\webapp\\cms\\views"))
+          val templateLoader = new FileTemplateLoader(new File(basedir, "views"))
           val cfg = new Configuration()
           cfg.setTemplateLoader(templateLoader)
 
@@ -89,21 +90,19 @@ class RootServlet extends HttpServlet {
             currentTemplate.view
           }
 
-          var regions = new mutable.HashMap[String, String]()
+          val regions = new mutable.HashMap[String, String]()
           val view = getRootView(matchNode.template, regions)
 
           val ftlTemplate = cfg.getTemplate(view)
           val dataContext = new util.HashMap[String, Any]
           dataContext.put("region", new RegionDirective)
           dataContext.put("module", new ModuleDirective)
-          dataContext.put("cmsConfig", cmsConfig)
+          dataContext.put("cmsContext", new CmsContext(cmsConfig, matchNode, templateLoader, dataContext))
 
           regions.foreach((tuple: (String, String)) => dataContext.put(
             "region_" + tuple._1, cfg.getTemplate(tuple._2)
           ))
 
-          //dataContext.put("someVar", "SomeVariableContent")
-          //dataContext.put("region_main", "MyRegionContent ${someVar}")
           ftlTemplate.process(dataContext, response.getWriter)
         }
       }
