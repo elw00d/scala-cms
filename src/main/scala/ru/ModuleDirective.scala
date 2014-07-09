@@ -15,14 +15,11 @@ class ModuleDirective extends TemplateDirectiveModel {
                        params: util.Map[_, _],
                        loopVars: Array[TemplateModel],
                        body: TemplateDirectiveBody): Unit = {
-    val cmsConfig: CmsConfig = env.getDataModel.get("cmsConfig").asInstanceOf[BeanModel]
-      .getWrappedObject.asInstanceOf[CmsConfig]
-    val className: String = cmsConfig.modules.get(params.get("id").asInstanceOf[SimpleScalar].getAsString)
+    val cmsContext: CmsContext = env.getDataModel.get("cmsContext").asInstanceOf[BeanModel]
+      .getWrappedObject.asInstanceOf[CmsContext]
+    val className: String = cmsContext.cmsConfig.modules.get(params.get("id").asInstanceOf[SimpleScalar].getAsString)
     val module: IModule = Class.forName(className).getConstructor().newInstance().asInstanceOf[IModule]
-    val renderedContent: String = module.render(new CmsContext(cmsConfig,
-      new Node("urlPrefix !", null, null),
-      null,
-      null))
+    val renderedContent: String = module.render(cmsContext)
     env.getOut.write(renderedContent)
   }
 }

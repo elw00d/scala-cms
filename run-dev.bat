@@ -1,0 +1,1 @@
+gradle jettyRunDebug -Pprofile=dev
