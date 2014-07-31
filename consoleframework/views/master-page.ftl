@@ -45,11 +45,11 @@
             <ul class="nav">
               <li class="active"><a href="${baseUrl}/">Home</a></li>
               <li><a href="${baseUrl}/downloads">Downloads</a></li>
-              <li><a href="${baseUrl}/sources">Source code</a></li>
+              <li><a href="https://github.com/elw00d/consoleframework">Github</a></li>
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Docs <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                  <li><a href="#">Getting started</a></li>
+                  <li><a href="${baseUrl}/getting-started.html">Getting started</a></li>
                   <li><a href="#">Building from sources</a></li>
                   <li><a href="#">Examples</a></li>
                   <li class="divider"></li>
@@ -60,71 +60,82 @@
                 </ul>
               </li>
             </ul>
-            <#--<form class="navbar-form pull-right">
-              <input class="span2" type="text" placeholder="Email">
-              <input class="span2" type="password" placeholder="Password">
-              <button type="submit" class="btn">Sign in</button>
-            </form>-->
           </div><!--/.nav-collapse -->
         </div>
       </div>
     </div>
 
     <div class="container">
+        <@region id="main">
+            <!-- Main hero unit for a primary marketing message or call to action -->
+            <div class="hero-unit">
+                <h1>Console Framework</h1>
 
-      <!-- Main hero unit for a primary marketing message or call to action -->
-      <div class="hero-unit">
-        <h1>Console Framework</h1>
-        <p>Console framework is cross-platform toolkit that allows to develop TUI applications using C# and based on WPF-like concepts.</p>
-        <p><a href="#" class="btn btn-primary btn-large">Learn more</a></p>
-      </div>
+                <p>Console framework is cross-platform toolkit that allows to develop TUI applications using C# and based on WPF-like concepts.</p>
 
-      <!-- Example row of columns -->
-      <div class="row">
-        <div class="span4">
-          <h2>Declarative markup</h2>
-          <p>XAML support allows to design UI using the most productive way.</p>
-          <p><a class="btn" href="#">View details</a></p>
-        </div>
-        <div class="span4">
-          <h2>Data binding</h2>
-          <p>No boilerplate code! Define your bindings in XAML markup directly.</p>
-          <p><a class="btn" href="#">View details</a></p>
-       </div>
-        <div class="span4">
-          <h2>Retained mode rendering system</h2>
-          <p>Solid rendering system is integrated into events loop. Routed events system is similar to WPF too.</p>
-          <p><a class="btn" href="#">View details</a></p>
-        </div>
-      </div>
+                <p><a href="#" class="btn btn-primary btn-large">Learn more</a></p>
+            </div>
 
-        <div class="row">
-        <div class="span4">
-          <h2>WPF-compatible layout system</h2>
-          <p>Simple and flexible layout system with panels and end-controls. You can use standard
-          components or easily write custom one. <#--Each component is measured and arranged using WPF-compatible
-          layout protocol, so you can use your experience in WPF to write your custom controls.--></p>
-          <p><a class="btn" href="#">View details</a></p>
-        </div>
-        <div class="span4">
-          <h2>A lot of controls available</h2>
-          <p>For example: Grid, ScrollViewer, ListBox, ComboBox, TreeView</p>
-          <p><a class="btn" href="#">View details</a></p>
-       </div>
-        <div class="span4">
-          <h2>Crossplatform</h2>
-          <p>Windows, Mac OS X and any Linux (32-bit or 64-bit) support</p>
-          <p><a class="btn" href="#">View details</a></p>
-        </div>
-      </div>
+            <!-- Example row of columns -->
+            <div class="row">
+                <div class="span4">
+                    <h2>Declarative markup</h2>
 
-      <hr>
+                    <p>XAML support allows to design UI using the most productive way.</p>
 
-      <footer>
-        <p>&copy; elwood 2013</p>
-      </footer>
+                    <p><a class="btn" href="#">View details</a></p>
+                </div>
+                <div class="span4">
+                    <h2>Data binding</h2>
 
-    </div> <!-- /container -->
+                    <p>No boilerplate code! Define your bindings in XAML markup directly.</p>
+
+                    <p><a class="btn" href="#">View details</a></p>
+                </div>
+                <div class="span4">
+                    <h2>Retained mode rendering system</h2>
+
+                    <p>Solid rendering system is integrated into events loop. Routed events system is similar to WPF too.</p>
+
+                    <p><a class="btn" href="#">View details</a></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="span4">
+                    <h2>WPF-compatible layout system</h2>
+
+                    <p>Simple and flexible layout system with panels and end-controls. You can use standard
+                        components or easily write custom one. <#--Each component is measured and arranged using WPF-compatible
+              layout protocol, so you can use your experience in WPF to write your custom controls.--></p>
+
+                    <p><a class="btn" href="#">View details</a></p>
+                </div>
+                <div class="span4">
+                    <h2>A lot of controls available</h2>
+
+                    <p>For example: Grid, ScrollViewer, ListBox, ComboBox, TreeView</p>
+
+                    <p><a class="btn" href="#">View details</a></p>
+                </div>
+                <div class="span4">
+                    <h2>Crossplatform</h2>
+
+                    <p>Windows, Mac OS X and any Linux (32-bit or 64-bit) support</p>
+
+                    <p><a class="btn" href="#">View details</a></p>
+                </div>
+            </div>
+        </@region>
+
+        <hr>
+
+        <footer>
+            <p>&copy; elwood 2013</p>
+        </footer>
+
+    </div>
+    <!-- /container -->
 
     <!-- Le javascript
     ================================================== -->
