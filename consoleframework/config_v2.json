@@ -2,18 +2,24 @@
     "templates": [
         {
             "id": "master-page",
-            "view": "master-page.ftl"
+            "view": "master-page.ftl",
+            "attributes": {
+                "active-page": null
+            }
         },
         {
             "id": "getting-started",
             "baseTemplate": "master-page",
             "regions": {
                 "main": "getting-started.ftl"
+            },
+            "attributes": {
+                "active-page": "getting-started"
             }
         }
     ],
     "modules": {
-        "currentNodeModule": "ru.CurrentNodeModule"
+        "menuModule": "ru.MenuModule"
     },
     "rootNode": {
         /* первый и последний слеш будет проигнорирован */

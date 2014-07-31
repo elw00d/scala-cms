@@ -22,3 +22,10 @@ class CurrentNodeModule extends IModule {
     cmsContext.node.urlPrefix
   }
 }
+
+class MenuModule extends IModule {
+  override def render(cmsContex: CmsContext): String = {
+    System.out.println(cmsContex.node.attributes.get("active-page"))
+    ""
+  }
+}
