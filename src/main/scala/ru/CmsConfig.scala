@@ -24,11 +24,13 @@ class CmsConfig(@BeanProperty var rootNode: Node,
 
 class Node(@BeanProperty var urlPrefix: String,
            @BeanProperty var template: String,
-           @BeanProperty var nodes: Array[Node]) {
+           @BeanProperty var nodes: Array[Node],
+            @BeanProperty var attributes: java.util.HashMap[String, Object]) {
 }
 
 class Template(@BeanProperty var id: String,
                 @BeanProperty var view: String,
                 @BeanProperty var baseTemplate: String,
-                @BeanProperty var regions: java.util.HashMap[String, String]) {
+                @BeanProperty var regions: java.util.HashMap[String, String],
+                @BeanProperty var attributes: java.util.HashMap[String, Object]) {
 }

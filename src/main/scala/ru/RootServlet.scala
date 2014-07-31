@@ -131,7 +131,9 @@ class RootServlet extends HttpServlet {
           val cfg = new Configuration()
           cfg.setTemplateLoader(templateLoader)
 
-          def getRootView(templateId: String, regionsMap: mutable.HashMap[String, String]) : String = {
+          def getRootView(templateId: String,
+                          regionsMap: mutable.HashMap[String, String],
+                           attributesMap: java.util.HashMap[String, Object]) : String = {
             var currentTemplate = cmsConfig.getTemplateById(templateId)
             // Если шаблона с таким именем нет, считаем, что это и есть view
             if (currentTemplate == null) return templateId
@@ -140,7 +142,12 @@ class RootServlet extends HttpServlet {
               // добавляем их в общий словарь
               if (currentTemplate.regions != null){
                 currentTemplate.regions.foreach((tuple: (String, String)) => {
-                  regionsMap.put(tuple._1, getRootView(tuple._2, regionsMap))
+                  regionsMap.put(tuple._1, getRootView(tuple._2, regionsMap, attributesMap))
+                })
+              }
+              if (currentTemplate.attributes != null){
+                currentTemplate.attributes.foreach((tuple: (String, Object)) => {
+                  attributesMap.put(tuple._1, tuple._2)
                 })
               }
               currentTemplate = cmsConfig.getTemplateById(currentTemplate.baseTemplate)
@@ -149,7 +156,12 @@ class RootServlet extends HttpServlet {
           }
 
           val regions = new mutable.HashMap[String, String]()
-          val view = getRootView(matchNode.template, regions)
+          val attributes = new java.util.HashMap[String, Object]()
+          val view = getRootView(matchNode.template, regions, attributes)
+
+          if (matchNode.attributes == null) {
+            matchNode.attributes = attributes
+          }
 
           val ftlTemplate = cfg.getTemplate(view)
           val dataContext = new util.HashMap[String, Any]
