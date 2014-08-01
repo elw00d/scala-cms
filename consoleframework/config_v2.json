@@ -11,7 +11,7 @@
             "id": "getting-started",
             "baseTemplate": "master-page",
             "regions": {
-                "main": "getting-started.ftl"
+                "main": "docs/getting-started.ftl"
             },
             "attributes": {
                 "active-page": "docs"
@@ -25,6 +25,26 @@
             },
             "attributes": {
                 "active-page": "downloads"
+            }
+        },
+        {
+            "id": "build-from-source",
+            "baseTemplate": "master-page",
+            "regions": {
+                "main": "docs/build-from-source.ftl"
+            },
+            "attributes": {
+                "active-page": "docs"
+            }
+        },
+        {
+            "id": "examples",
+            "baseTemplate": "master-page",
+            "regions": {
+                "main": "docs/examples.ftl"
+            },
+            "attributes": {
+                "active-page": "docs"
             }
         }
     ],
@@ -48,6 +68,14 @@
             {
                 "urlPrefix": "downloads.html",
                 "template": "downloads"
+            },
+            {
+                "urlPrefix": "build-from-sources.html",
+                "template": "build-from-source"
+            },
+            {
+                "urlPrefix": "examples",
+                "template": "examples"
             }
         ]
     }

@@ -6,7 +6,7 @@
     <a <#if activePage?? && activePage == "docs">class="active dropdown-toggle"<#else>class="dropdown-toggle"</#if> href="#" data-toggle="dropdown">Docs <b class="caret"></b></a>
     <ul class="dropdown-menu">
       <li><a href="${baseUrl}/getting-started.html">Getting started</a></li>
-      <li><a href="${baseUrl}/building-from-sources.html">Building from sources</a></li>
+      <li><a href="${baseUrl}/build-from-sources.html">Building from sources</a></li>
       <li><a href="${baseUrl}/examples.html">Examples</a></li>
       <li class="divider"></li>
       <li><a href="${baseUrl}/xaml.html">XAML reference</a></li>
