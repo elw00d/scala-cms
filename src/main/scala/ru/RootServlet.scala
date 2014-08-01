@@ -145,6 +145,7 @@ class RootServlet extends HttpServlet {
                   regionsMap.put(tuple._1, getRootView(tuple._2, regionsMap, attributesMap))
                 })
               }
+              // То же самое с атрибутами
               if (currentTemplate.attributes != null){
                 currentTemplate.attributes.foreach((tuple: (String, Object)) => {
                   attributesMap.put(tuple._1, tuple._2)
@@ -167,7 +168,7 @@ class RootServlet extends HttpServlet {
           val dataContext = new util.HashMap[String, Any]
           dataContext.put("region", new RegionDirective)
           dataContext.put("module", new ModuleDirective)
-          dataContext.put("cmsContext", new CmsContext(cmsConfig, matchNode, templateLoader, dataContext))
+          dataContext.put("cmsContext", new CmsContext(cmsConfig, matchNode, cfg, dataContext))
           dataContext.put("baseUrl", "/webapp")
 
           regions.foreach((tuple: (String, String)) => dataContext.put(

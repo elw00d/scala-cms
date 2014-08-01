@@ -1,5 +1,7 @@
 package ru
 
+import com.google.gson.annotations.SerializedName
+
 import scala.beans.BeanProperty
 import scala.collection.immutable.HashMap
 
@@ -9,7 +11,7 @@ import scala.collection.immutable.HashMap
  */
 class CmsConfig(@BeanProperty var rootNode: Node,
                  @BeanProperty var templates: Array[Template],
-                 @BeanProperty var modules: java.util.HashMap[String, String]) {
+                 @BeanProperty var modules: java.util.HashMap[String, Module]) {
   private var map: collection.mutable.HashMap[String,Template] = null
 
   // todo : do this in ctor
@@ -20,6 +22,10 @@ class CmsConfig(@BeanProperty var rootNode: Node,
     }
     map.get(id).orNull
   }
+}
+
+class Module(@BeanProperty var className: String,
+              @BeanProperty var attributes: java.util.HashMap[String, Object]) {
 }
 
 class Node(@BeanProperty var urlPrefix: String,

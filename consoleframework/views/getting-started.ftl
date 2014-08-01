@@ -7,6 +7,3 @@
     <li>In <code>Examples</code> project settings choose one of entry points</li>
     <li>Build & run it!</li>
 </ul>
-
-<@module id="menuModule">
-</@module>
