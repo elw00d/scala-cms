@@ -42,24 +42,8 @@
           </button>
           <a class="brand" href="${baseUrl}/">Console Framework</a>
           <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="active"><a href="${baseUrl}/">Home</a></li>
-              <li><a href="${baseUrl}/downloads">Downloads</a></li>
-              <li><a href="https://github.com/elw00d/consoleframework">Github</a></li>
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Docs <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li><a href="${baseUrl}/getting-started.html">Getting started</a></li>
-                  <li><a href="${baseUrl}/building-from-sources.html">Building from sources</a></li>
-                  <li><a href="${baseUrl}/examples.html">Examples</a></li>
-                  <li class="divider"></li>
-                  <li><a href="${baseUrl}/xaml.html">XAML reference</a></li>
-                  <li><a href="${baseUrl}/binding.html">Data binding reference</a></li>
-                  <li><a href="${baseUrl}/layout.html">Layout system reference</a></li>
-                  <li><a href="${baseUrl}/custom-controls.html">Writing custom controls</a></li>
-                </ul>
-              </li>
-            </ul>
+            <@module id="menuModule">
+            </@module>
           </div><!--/.nav-collapse -->
         </div>
       </div>
@@ -67,9 +51,6 @@
 
     <div class="container">
         <@region id="main">
-            <@module id="menuModule">
-            </@module>
-
             <!-- Main hero unit for a primary marketing message or call to action -->
             <div class="hero-unit">
                 <h1>Console Framework</h1>

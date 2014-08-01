@@ -17,9 +17,9 @@ class ModuleDirective extends TemplateDirectiveModel {
                        body: TemplateDirectiveBody): Unit = {
     val cmsContext: CmsContext = env.getDataModel.get("cmsContext").asInstanceOf[BeanModel]
       .getWrappedObject.asInstanceOf[CmsContext]
-    val className: String = cmsContext.cmsConfig.modules.get(params.get("id").asInstanceOf[SimpleScalar].getAsString)
-    val module: IModule = Class.forName(className).getConstructor().newInstance().asInstanceOf[IModule]
-    val renderedContent: String = module.render(cmsContext)
+    val moduleInfo: Module = cmsContext.cmsConfig.modules.get(params.get("id").asInstanceOf[SimpleScalar].getAsString)
+    val module: IModule = Class.forName(moduleInfo.className).getConstructor().newInstance().asInstanceOf[IModule]
+    val renderedContent: String = module.render(cmsContext, moduleInfo.attributes)
     env.getOut.write(renderedContent)
   }
 }

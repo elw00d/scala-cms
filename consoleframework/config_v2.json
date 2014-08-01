@@ -14,12 +14,27 @@
                 "main": "getting-started.ftl"
             },
             "attributes": {
-                "active-page": "getting-started"
+                "active-page": "docs"
+            }
+        },
+        {
+            "id": "downloads",
+            "baseTemplate": "master-page",
+            "regions": {
+                "main": "downloads.ftl"
+            },
+            "attributes": {
+                "active-page": "downloads"
             }
         }
     ],
     "modules": {
-        "menuModule": "ru.MenuModule"
+        "menuModule": {
+            "className": "ru.MenuModule",
+            "attributes": {
+                "view": "menu.ftl"
+            }
+        }
     },
     "rootNode": {
         /* первый и последний слеш будет проигнорирован */
@@ -29,6 +44,10 @@
             {
                 "urlPrefix": "getting-started.html",
                 "template": "getting-started"
+            },
+            {
+                "urlPrefix": "downloads.html",
+                "template": "downloads"
             }
         ]
     }
