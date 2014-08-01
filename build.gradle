@@ -31,11 +31,7 @@ repositories {
 }
 
 dependencies {
-    //scalaTools "org.scala-lang:scala-compiler:2.11.1"
     compile 'org.freemarker:freemarker:2.3.20';
-//    compile 'org.springframework:spring-webmvc:3.2.3.RELEASE'
-//    compile 'org.springframework:spring-context-support:3.2.3.RELEASE'
-//    compile 'org.springframework.scala:spring-scala_2.10:1.0.0.RC1'
     compile 'org.scala-lang:scala-library:2.11.1'
     compile 'javax.servlet:javax.servlet-api:3.1.0'
     compile 'com.google.code.gson:gson:2.2.4'
