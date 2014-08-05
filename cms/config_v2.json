@@ -35,7 +35,9 @@
         }
     ],
     "modules": {
-        "currentNodeModule": "ru.CurrentNodeModule"
+        "currentNodeModule": {
+            "className": "ru.CurrentNodeModule"
+        }
     },
     "rootNode": {
         /* первый и последний слеш будет проигнорирован */
