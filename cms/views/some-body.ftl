@@ -1,3 +1,3 @@
 SOME BODY
-<@module id="currentNodeModule">
+<@module id="formModule">
 </@module>

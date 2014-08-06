@@ -1,6 +1,7 @@
 package ru
 
 import java.util
+import javax.servlet.http.HttpServletRequest
 
 import freemarker.core.Environment
 import freemarker.ext.beans.BeanModel
@@ -15,11 +16,20 @@ class ModuleDirective extends TemplateDirectiveModel {
                        params: util.Map[_, _],
                        loopVars: Array[TemplateModel],
                        body: TemplateDirectiveBody): Unit = {
+    val originalHttpRequest: HttpServletRequest = env.getDataModel.get("originalHttpRequest").asInstanceOf[BeanModel]
+      .getWrappedObject.asInstanceOf[HttpServletRequest]
     val cmsContext: CmsContext = env.getDataModel.get("cmsContext").asInstanceOf[BeanModel]
       .getWrappedObject.asInstanceOf[CmsContext]
-    val moduleInfo: Module = cmsContext.cmsConfig.modules.get(params.get("id").asInstanceOf[SimpleScalar].getAsString)
-    val module: IModule = Class.forName(moduleInfo.className).getConstructor().newInstance().asInstanceOf[IModule]
-    val renderedContent: String = module.render(cmsContext, moduleInfo.attributes)
+    val instanceId: String = params.get("id").asInstanceOf[SimpleScalar].getAsString
+    val instance: ModuleInstance = cmsContext.node.modules.filter((instance: ModuleInstance) => instance.getInstanceId == instanceId)
+      .last
+    val moduleDefinition: ModuleDefinition = cmsContext.cmsConfig.moduleDefinitions.get(instance.getDefinitionId)
+    val module: IModule = Class.forName(moduleDefinition.className).getConstructor().newInstance().asInstanceOf[IModule]
+
+    val restPath: String = env.getDataModel.get("restPath").asInstanceOf[SimpleScalar].getAsString
+
+    val moduleContext: ModuleContext = new ModuleContext(instance, restPath, cmsContext, moduleDefinition.attributes)
+    val renderedContent: String = module.render(moduleContext)
     env.getOut.write(renderedContent)
   }
 }

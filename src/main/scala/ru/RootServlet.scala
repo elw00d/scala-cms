@@ -21,7 +21,14 @@ import scala.io.{Source, BufferedSource}
  */
 @WebServlet(value=Array("/"), name = "rootServlet")
 class RootServlet extends HttpServlet {
-  def bestMatch(rootNode: Node, reqPath: String): Node = {
+  /**
+   * Возвращает Tuple(Node, String, String)
+   * Node - лучшее совпадение с урлом (или null, если не найдено)
+   * String - совпавшая часть урла (или пустая строка, если совпадение не найдено)
+   * String - оставшаяся часть урла
+   * @return
+   */
+  def bestMatch(rootNode: Node, reqPath: String): (Node, String, String) = {
     def matches (node: Node, prefix: String): (Boolean, String) = {
       // Нормализуем ServletPath - убираем первый и последний слеши, двойные слеши
       // заменяем на одинарные
@@ -29,28 +36,31 @@ class RootServlet extends HttpServlet {
       val normalizedNodePrefix = node.getUrlPrefix.split("/").filter(!_.isEmpty).mkString("/")
       if (normalizedPrefix.startsWith(normalizedNodePrefix))
         return (true, normalizedPrefix.substring(normalizedNodePrefix.length))
-      (false, reqPath)
+      (false, prefix)
     }
 
     var prefix = reqPath
     var candidates: List[Node] = List(rootNode)
     var bestMatch: Node = null
+    var matchedPath: String = ""
     while (candidates != null) {
       val matchedNode: Option[Node] = candidates.find((node: Node) => {
         val matchResult: (Boolean, String) = matches(node, prefix)
         matchResult._1
       })
       if (matchedNode.isEmpty)
-        return bestMatch
+        return (bestMatch, matchedPath, prefix)
       val matchResult: (Boolean, String) = matches(matchedNode.get, prefix)
       bestMatch = matchedNode.get
+      val normalizedNodePrefix = matchedNode.get.urlPrefix.split("/").filter(!_.isEmpty).mkString("/")
+      matchedPath = matchedPath + "/" + normalizedNodePrefix
       prefix = matchResult._2
       if (matchedNode.get.nodes != null)
         candidates = matchedNode.get.nodes.toList
       else
         candidates = null
     }
-    bestMatch
+    (bestMatch, matchedPath, prefix)
   }
 
   class Loan[A <: AutoCloseable](resource: A) {
@@ -119,7 +129,10 @@ class RootServlet extends HttpServlet {
 
     // Get best match node
     System.out.println("Path: " + req.getServletPath)
-    val matchNode: Node = bestMatch(cmsConfig.rootNode, req.getServletPath)
+    val matchResult = bestMatch(cmsConfig.rootNode, req.getServletPath)
+    val matchNode: Node = matchResult._1
+    val matchedPath: String = matchResult._2
+    val restPath : String = matchResult._3
 
     val method: String = req.getMethod
     val handler = method match {
@@ -169,7 +182,12 @@ class RootServlet extends HttpServlet {
           dataContext.put("region", new RegionDirective)
           dataContext.put("module", new ModuleDirective)
           dataContext.put("cmsContext", new CmsContext(cmsConfig, matchNode, cfg, dataContext))
+          // Оригинальный http запрос нужен для ModuleDirective, чтобы извлечь
+          // параметры и передать их в модуль
+          dataContext.put("originalHttpRequest", req)
           dataContext.put("baseUrl", "/webapp")
+          dataContext.put("matchedPath", matchedPath)
+          dataContext.put("restPath", restPath)
 
           regions.foreach((tuple: (String, String)) => dataContext.put(
             "region_" + tuple._1, cfg.getTemplate(tuple._2)
@@ -177,6 +195,12 @@ class RootServlet extends HttpServlet {
 
           ftlTemplate.process(dataContext, response.getWriter)
         }
+      }
+      case "POST" => (request: HttpServletRequest, response: HttpServletResponse) => {
+        if (matchNode == null || matchNode.template == null) {
+          response.getWriter.print("Handler not found")
+        }
+        // todo : pass request to active module if it exists
       }
       case _ => (request: HttpServletRequest, response: HttpServletResponse) => {
         response.getWriter.print("Handler not found")
