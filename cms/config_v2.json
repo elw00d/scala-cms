@@ -34,9 +34,12 @@
             }
         }
     ],
-    "modules": {
+    "moduleDefinitions": {
         "currentNodeModule": {
             "className": "ru.CurrentNodeModule"
+        },
+        "testFormModule": {
+            "className": "ru.TestFormModule"
         }
     },
     "rootNode": {
@@ -53,7 +56,17 @@
                 "nodes": [
                     {
                         "urlPrefix": "index.html",
-                        "template": "concrete-view2"
+                        "template": "concrete-view2",
+                        "modules": [
+                            {
+                                "definitionId": "currentNodeModule",
+                                "instanceId": "nodeModuleInstance"
+                            },
+                            {
+                                "definitionId": "testFormModule",
+                                "instanceId": "formModule"
+                            }
+                        ]
                     }
                 ]
             }

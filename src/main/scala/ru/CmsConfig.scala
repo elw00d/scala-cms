@@ -11,7 +11,7 @@ import scala.collection.immutable.HashMap
  */
 class CmsConfig(@BeanProperty var rootNode: Node,
                  @BeanProperty var templates: Array[Template],
-                 @BeanProperty var modules: java.util.HashMap[String, Module]) {
+                 @BeanProperty var moduleDefinitions: java.util.HashMap[String, ModuleDefinition]) {
   private var map: collection.mutable.HashMap[String,Template] = null
 
   // todo : do this in ctor
@@ -24,14 +24,20 @@ class CmsConfig(@BeanProperty var rootNode: Node,
   }
 }
 
-class Module(@BeanProperty var className: String,
+class ModuleDefinition(@BeanProperty var className: String,
               @BeanProperty var attributes: java.util.HashMap[String, Object]) {
+}
+
+class ModuleInstance(@BeanProperty var definitionId :String,
+                      @BeanProperty var instanceId: String,
+                      @BeanProperty var attributes: java.util.HashMap[String, Object]) {
 }
 
 class Node(@BeanProperty var urlPrefix: String,
            @BeanProperty var template: String,
            @BeanProperty var nodes: Array[Node],
-            @BeanProperty var attributes: java.util.HashMap[String, Object]) {
+            @BeanProperty var attributes: java.util.HashMap[String, Object],
+            @BeanProperty var modules: Array[ModuleInstance]) {
 }
 
 class Template(@BeanProperty var id: String,
