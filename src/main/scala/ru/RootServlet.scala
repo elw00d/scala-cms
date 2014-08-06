@@ -197,10 +197,30 @@ class RootServlet extends HttpServlet {
         }
       }
       case "POST" => (request: HttpServletRequest, response: HttpServletResponse) => {
-        if (matchNode == null || matchNode.template == null) {
+        if (matchNode == null || matchNode.template == null || matchNode.modules == null) {
           response.getWriter.print("Handler not found")
+        } else {
+          // todo : pass request to active module if it exists
+
+          // fixme: make bestMatch instead of startsWith !
+          val moduleInstance: ModuleInstance = matchNode.modules.find((instance: ModuleInstance) => restPath.startsWith(instance.instanceId))
+            .last
+          if (null == moduleInstance) {
+            response.getWriter.print("Handler not found")
+          } else {
+            val templateLoader = new FileTemplateLoader(new File(basedir, "views"))
+            val cfg = new Configuration()
+            cfg.setTemplateLoader(templateLoader)
+
+            val moduleDefinition: ModuleDefinition = cmsConfig.moduleDefinitions.get(moduleInstance.definitionId)
+            val module: IModule = Class.forName(moduleDefinition.className).getConstructor().newInstance().asInstanceOf[IModule]
+            val moduleContent: String = module.handleAction(new ModuleContext(moduleInstance, /* todo : pass restOfPath after best match */ "",
+              new CmsContext(cmsConfig, matchNode, cfg, null),
+              moduleDefinition.attributes))
+
+            //
+          }
         }
-        // todo : pass request to active module if it exists
       }
       case _ => (request: HttpServletRequest, response: HttpServletResponse) => {
         response.getWriter.print("Handler not found")
