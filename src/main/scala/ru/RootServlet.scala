@@ -187,7 +187,9 @@ class RootServlet extends HttpServlet {
     dataContext.put("region", new RegionDirective)
     dataContext.put("module", new ModuleDirective)
     dataContext.put("matchedPath", matchedPath)
-    dataContext.put("baseUrl", "/webapp")
+    // todo : make not const
+    val baseUrl = "/webapp"
+    dataContext.put("baseUrl", baseUrl)
 
     // fixme: make bestMatch instead of startsWith !
     val activeModuleInstance: ModuleInstance = matchNode.modules.find((instance: ModuleInstance) => restPath.startsWith(instance.instanceId))
@@ -201,13 +203,14 @@ class RootServlet extends HttpServlet {
     // Рендерим модули
     val modulesContentMap = new mutable.HashMap[String, String]()
     if (null != activeModuleInstance) {
-      val modulePath = restPath.substring(activeModuleInstance.instanceId.length)
+      val modulePath = normalize(restPath.substring(activeModuleInstance.instanceId.length))
       val moduleDefinition: ModuleDefinition = cmsConfig.moduleDefinitions.get(activeModuleInstance.definitionId)
       val module: IModule = Class.forName(moduleDefinition.className).getConstructor().newInstance().asInstanceOf[IModule]
-      val moduleContent: String = module.handleAction(new ModuleContext(
-        activeModuleInstance, modulePath,
-        new CmsContext(cmsConfig, matchNode, cfg, dataContext),
-        moduleDefinition.attributes)
+      val moduleContent: String = module.service(new ModuleContext(
+        activeModuleInstance,
+        new CmsContext(cmsConfig, matchNode, cfg, baseUrl, matchedPath, req),
+        moduleDefinition.attributes),
+        new ActiveModuleContext(modulePath, method, req.getParameterMap)
       )
       modulesContentMap.put(activeModuleInstance.instanceId, moduleContent)
     }
@@ -215,14 +218,12 @@ class RootServlet extends HttpServlet {
     for (moduleInstance <- matchNode.modules if moduleInstance != activeModuleInstance) {
       val definition: ModuleDefinition = cmsConfig.moduleDefinitions.get(moduleInstance.getDefinitionId)
       val module: IModule = Class.forName(definition.className).getConstructor().newInstance().asInstanceOf[IModule]
-      val restPath: String = ""
       val moduleContext: ModuleContext = new ModuleContext(
         moduleInstance,
-        restPath,
-        new CmsContext(cmsConfig, matchNode, cfg, dataContext),
+        new CmsContext(cmsConfig, matchNode, cfg, baseUrl, matchedPath, req),
         definition.attributes
       )
-      val content: String = module.render(moduleContext)
+      val content: String = module.service(moduleContext, null)
       modulesContentMap.put(moduleInstance.instanceId, content)
     }
 
