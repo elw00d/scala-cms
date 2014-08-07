@@ -11,7 +11,7 @@ import freemarker.template.SimpleScalar
  */
 class TestFormModule extends IModule {
   override def service(moduleContext: ModuleContext, activeModuleContext: ActiveModuleContext): String = {
-    if (activeModuleContext != null) {
+    if (activeModuleContext != null && activeModuleContext.method == "POST") {
       System.out.println("modulePath: " + activeModuleContext.path)
       val entered: String = activeModuleContext.params.get("name")(0)
       val template: freemarker.template.Template = moduleContext.cmsContext.freemarkerConfiguration.getTemplate("testFormModule.ftl")

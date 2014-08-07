@@ -64,7 +64,11 @@
                             },
                             {
                                 "definitionId": "testFormModule",
-                                "instanceId": "formModule"
+                                "instanceId": "formModule1"
+                            },
+                            {
+                                "definitionId": "testFormModule",
+                                "instanceId": "formModule2"
                             }
                         ]
                     }
