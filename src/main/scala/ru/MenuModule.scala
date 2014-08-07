@@ -13,7 +13,7 @@ import java.util
  *         01.08.2014 14:07
  */
 class MenuModule extends IModule {
-  override def service(moduleContext: ModuleContext, activeModuleContext: ActiveModuleContext): String = {
+  override def service(moduleContext: ModuleContext, activeModuleContext: ActiveModuleContext): ModuleResult = {
     System.out.println("Active page is " + moduleContext.cmsContext.node.attributes.get("active-page"))
     val template: freemarker.template.Template = moduleContext.cmsContext.freemarkerConfiguration.getTemplate(
       moduleContext.attributes.get("view").asInstanceOf[String])
@@ -25,6 +25,6 @@ class MenuModule extends IModule {
     dataContext.put("activePage", moduleContext.cmsContext.node.attributes.get("active-page"))
     val stringWriter: StringWriter = new StringWriter()
     template.process(dataContext, stringWriter)
-    stringWriter.toString
+    new ContentResult(stringWriter.toString)
   }
 }

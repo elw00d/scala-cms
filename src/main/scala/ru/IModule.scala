@@ -2,7 +2,7 @@ package ru
 
 import java.io.StringWriter
 import java.util
-import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
 import freemarker.cache.TemplateLoader
 import freemarker.template.Configuration
@@ -42,6 +42,15 @@ class ActiveModuleContext(var path: String,
                            var params: java.util.Map[String, Array[String]]) {
 }
 
+abstract class ModuleResult {
+}
+
+class ContentResult(var content: String) extends ModuleResult {
+}
+
+class DirectResponseResult(var responseMutator: (HttpServletResponse) => Unit) extends ModuleResult {
+}
+
 trait IModule {
   /**
    *
@@ -50,13 +59,13 @@ trait IModule {
    *                            not null, если текущий запрос ведёт именно к этому модулю
    * @return
    */
-  def service(moduleContext: ModuleContext, activeModuleContext: ActiveModuleContext): String
+  def service(moduleContext: ModuleContext, activeModuleContext: ActiveModuleContext): ModuleResult
 }
 
 // Тестовый модуль для демонстрации возможностей cmsContext
 class CurrentNodeModule extends IModule {
-  override def service(moduleContext: ModuleContext, activeModuleContext: ActiveModuleContext): String = {
-    moduleContext.cmsContext.node.urlPrefix
+  override def service(moduleContext: ModuleContext, activeModuleContext: ActiveModuleContext): ModuleResult = {
+    new ContentResult(moduleContext.cmsContext.node.urlPrefix)
   }
 }
 
