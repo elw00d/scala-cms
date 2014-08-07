@@ -6,7 +6,7 @@ import javax.servlet.ServletOutputStream
 import javax.servlet.annotation.WebServlet
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 import freemarker.cache.FileTemplateLoader
-import freemarker.template.Configuration
+import freemarker.template.{SimpleScalar, Configuration}
 
 import scala.collection.mutable
 import scala.collection.JavaConversions._
@@ -21,6 +21,10 @@ import scala.io.{Source, BufferedSource}
  */
 @WebServlet(value=Array("/"), name = "rootServlet")
 class RootServlet extends HttpServlet {
+  def normalize(path: String): String = {
+    path.split("/").filter(!_.isEmpty).mkString("/")
+  }
+
   /**
    * Возвращает Tuple(Node, String, String)
    * Node - лучшее совпадение с урлом (или null, если не найдено)
@@ -49,7 +53,7 @@ class RootServlet extends HttpServlet {
         matchResult._1
       })
       if (matchedNode.isEmpty)
-        return (bestMatch, matchedPath, prefix)
+        return (bestMatch, normalize(matchedPath), normalize(prefix))
       val matchResult: (Boolean, String) = matches(matchedNode.get, prefix)
       bestMatch = matchedNode.get
       val normalizedNodePrefix = matchedNode.get.urlPrefix.split("/").filter(!_.isEmpty).mkString("/")
@@ -60,7 +64,7 @@ class RootServlet extends HttpServlet {
       else
         candidates = null
     }
-    (bestMatch, matchedPath, prefix)
+    (bestMatch, normalize(matchedPath), normalize(prefix))
   }
 
   class Loan[A <: AutoCloseable](resource: A) {
@@ -135,97 +139,224 @@ class RootServlet extends HttpServlet {
     val restPath : String = matchResult._3
 
     val method: String = req.getMethod
-    val handler = method match {
-      case "GET" => (request: HttpServletRequest, response: HttpServletResponse) => {
-        if (matchNode == null || matchNode.template == null) {
-          response.getWriter.print("Not found")
-        } else {
-          val templateLoader = new FileTemplateLoader(new File(basedir, "views"))
-          val cfg = new Configuration()
-          cfg.setTemplateLoader(templateLoader)
 
-          def getRootView(templateId: String,
-                          regionsMap: mutable.HashMap[String, String],
-                           attributesMap: java.util.HashMap[String, Object]) : String = {
-            var currentTemplate = cmsConfig.getTemplateById(templateId)
-            // Если шаблона с таким именем нет, считаем, что это и есть view
-            if (currentTemplate == null) return templateId
-            while (currentTemplate.baseTemplate != null){
-              // Если есть какие-то регионы в текущем определении шаблона,
-              // добавляем их в общий словарь
-              if (currentTemplate.regions != null){
-                currentTemplate.regions.foreach((tuple: (String, String)) => {
-                  regionsMap.put(tuple._1, getRootView(tuple._2, regionsMap, attributesMap))
-                })
-              }
-              // То же самое с атрибутами
-              if (currentTemplate.attributes != null){
-                currentTemplate.attributes.foreach((tuple: (String, Object)) => {
-                  attributesMap.put(tuple._1, tuple._2)
-                })
-              }
-              currentTemplate = cmsConfig.getTemplateById(currentTemplate.baseTemplate)
-            }
-            currentTemplate.view
-          }
-
-          val regions = new mutable.HashMap[String, String]()
-          val attributes = new java.util.HashMap[String, Object]()
-          val view = getRootView(matchNode.template, regions, attributes)
-
-          if (matchNode.attributes == null) {
-            matchNode.attributes = attributes
-          }
-
-          val ftlTemplate = cfg.getTemplate(view)
-          val dataContext = new util.HashMap[String, Any]
-          dataContext.put("region", new RegionDirective)
-          dataContext.put("module", new ModuleDirective)
-          dataContext.put("cmsContext", new CmsContext(cmsConfig, matchNode, cfg, dataContext))
-          // Оригинальный http запрос нужен для ModuleDirective, чтобы извлечь
-          // параметры и передать их в модуль
-          dataContext.put("originalHttpRequest", req)
-          dataContext.put("baseUrl", "/webapp")
-          dataContext.put("matchedPath", matchedPath)
-          dataContext.put("restPath", restPath)
-
-          regions.foreach((tuple: (String, String)) => dataContext.put(
-            "region_" + tuple._1, cfg.getTemplate(tuple._2)
-          ))
-
-          ftlTemplate.process(dataContext, response.getWriter)
-        }
-      }
-      case "POST" => (request: HttpServletRequest, response: HttpServletResponse) => {
-        if (matchNode == null || matchNode.template == null || matchNode.modules == null) {
-          response.getWriter.print("Handler not found")
-        } else {
-          // todo : pass request to active module if it exists
-
-          // fixme: make bestMatch instead of startsWith !
-          val moduleInstance: ModuleInstance = matchNode.modules.find((instance: ModuleInstance) => restPath.startsWith(instance.instanceId))
-            .last
-          if (null == moduleInstance) {
-            response.getWriter.print("Handler not found")
-          } else {
-            val templateLoader = new FileTemplateLoader(new File(basedir, "views"))
-            val cfg = new Configuration()
-            cfg.setTemplateLoader(templateLoader)
-
-            val moduleDefinition: ModuleDefinition = cmsConfig.moduleDefinitions.get(moduleInstance.definitionId)
-            val module: IModule = Class.forName(moduleDefinition.className).getConstructor().newInstance().asInstanceOf[IModule]
-            val moduleContent: String = module.handleAction(new ModuleContext(moduleInstance, /* todo : pass restOfPath after best match */ "",
-              new CmsContext(cmsConfig, matchNode, cfg, null),
-              moduleDefinition.attributes))
-
-            //
-          }
-        }
-      }
-      case _ => (request: HttpServletRequest, response: HttpServletResponse) => {
-        response.getWriter.print("Handler not found")
-      }
+    if (method != "GET" && method != "POST") {
+      resp.getWriter.print("Handler not found")
+      return
     }
-    handler(req, resp)
+
+    val templateLoader = new FileTemplateLoader(new File(basedir, "views"))
+    val cfg = new Configuration()
+    cfg.setTemplateLoader(templateLoader)
+
+    def getRootView(templateId: String,
+                    regionsMap: mutable.HashMap[String, String],
+                     attributesMap: java.util.HashMap[String, Object]) : String = {
+      var currentTemplate = cmsConfig.getTemplateById(templateId)
+      // Если шаблона с таким именем нет, считаем, что это и есть view
+      if (currentTemplate == null) return templateId
+      while (currentTemplate.baseTemplate != null){
+        // Если есть какие-то регионы в текущем определении шаблона,
+        // добавляем их в общий словарь
+        if (currentTemplate.regions != null){
+          currentTemplate.regions.foreach((tuple: (String, String)) => {
+            regionsMap.put(tuple._1, getRootView(tuple._2, regionsMap, attributesMap))
+          })
+        }
+        // То же самое с атрибутами
+        if (currentTemplate.attributes != null){
+          currentTemplate.attributes.foreach((tuple: (String, Object)) => {
+            attributesMap.put(tuple._1, tuple._2)
+          })
+        }
+        currentTemplate = cmsConfig.getTemplateById(currentTemplate.baseTemplate)
+      }
+      currentTemplate.view
+    }
+
+    val regions = new mutable.HashMap[String, String]()
+    val attributes = new java.util.HashMap[String, Object]()
+    val view = getRootView(matchNode.template, regions, attributes)
+
+    if (matchNode.attributes == null) {
+      matchNode.attributes = attributes
+    }
+
+    val ftlTemplate = cfg.getTemplate(view)
+    val dataContext = new util.HashMap[String, Any]
+    dataContext.put("region", new RegionDirective)
+    dataContext.put("module", new ModuleDirective)
+    dataContext.put("matchedPath", matchedPath)
+    dataContext.put("baseUrl", "/webapp")
+
+    // fixme: make bestMatch instead of startsWith !
+    val activeModuleInstance: ModuleInstance = matchNode.modules.find((instance: ModuleInstance) => restPath.startsWith(instance.instanceId))
+      .lastOption.orNull
+
+    if (null == activeModuleInstance && method == "POST") {
+      resp.getWriter.print("Handler not found")
+      return
+    }
+
+    // Рендерим модули
+    val modulesContentMap = new mutable.HashMap[String, String]()
+    if (null != activeModuleInstance) {
+      val modulePath = restPath.substring(activeModuleInstance.instanceId.length)
+      val moduleDefinition: ModuleDefinition = cmsConfig.moduleDefinitions.get(activeModuleInstance.definitionId)
+      val module: IModule = Class.forName(moduleDefinition.className).getConstructor().newInstance().asInstanceOf[IModule]
+      val moduleContent: String = module.handleAction(new ModuleContext(
+        activeModuleInstance, modulePath,
+        new CmsContext(cmsConfig, matchNode, cfg, dataContext),
+        moduleDefinition.attributes)
+      )
+      modulesContentMap.put(activeModuleInstance.instanceId, moduleContent)
+    }
+    // Для всех остальных модулей на узле мы получаем default content
+    for (moduleInstance <- matchNode.modules if moduleInstance != activeModuleInstance) {
+      val definition: ModuleDefinition = cmsConfig.moduleDefinitions.get(moduleInstance.getDefinitionId)
+      val module: IModule = Class.forName(definition.className).getConstructor().newInstance().asInstanceOf[IModule]
+      val restPath: String = ""
+      val moduleContext: ModuleContext = new ModuleContext(
+        moduleInstance,
+        restPath,
+        new CmsContext(cmsConfig, matchNode, cfg, dataContext),
+        definition.attributes
+      )
+      val content: String = module.render(moduleContext)
+      modulesContentMap.put(moduleInstance.instanceId, content)
+    }
+
+    dataContext.put("modulesContentMap", modulesContentMap)
+
+    regions.foreach((tuple: (String, String)) => dataContext.put(
+      "region_" + tuple._1, cfg.getTemplate(tuple._2)
+    ))
+
+    ftlTemplate.process(dataContext, resp.getWriter)
+
+//    val handler = method match {
+//      case "GET" => (request: HttpServletRequest, response: HttpServletResponse) => {
+//        if (matchNode == null || matchNode.template == null) {
+//          response.getWriter.print("Not found")
+//        } else {
+//          val templateLoader = new FileTemplateLoader(new File(basedir, "views"))
+//          val cfg = new Configuration()
+//          cfg.setTemplateLoader(templateLoader)
+//
+//          def getRootView(templateId: String,
+//                          regionsMap: mutable.HashMap[String, String],
+//                           attributesMap: java.util.HashMap[String, Object]) : String = {
+//            var currentTemplate = cmsConfig.getTemplateById(templateId)
+//            // Если шаблона с таким именем нет, считаем, что это и есть view
+//            if (currentTemplate == null) return templateId
+//            while (currentTemplate.baseTemplate != null){
+//              // Если есть какие-то регионы в текущем определении шаблона,
+//              // добавляем их в общий словарь
+//              if (currentTemplate.regions != null){
+//                currentTemplate.regions.foreach((tuple: (String, String)) => {
+//                  regionsMap.put(tuple._1, getRootView(tuple._2, regionsMap, attributesMap))
+//                })
+//              }
+//              // То же самое с атрибутами
+//              if (currentTemplate.attributes != null){
+//                currentTemplate.attributes.foreach((tuple: (String, Object)) => {
+//                  attributesMap.put(tuple._1, tuple._2)
+//                })
+//              }
+//              currentTemplate = cmsConfig.getTemplateById(currentTemplate.baseTemplate)
+//            }
+//            currentTemplate.view
+//          }
+//
+//          val regions = new mutable.HashMap[String, String]()
+//          val attributes = new java.util.HashMap[String, Object]()
+//          val view = getRootView(matchNode.template, regions, attributes)
+//
+//          if (matchNode.attributes == null) {
+//            matchNode.attributes = attributes
+//          }
+//
+//          val ftlTemplate = cfg.getTemplate(view)
+//          val dataContext = new util.HashMap[String, Any]
+//          dataContext.put("region", new RegionDirective)
+//          dataContext.put("module", new ModuleDirective)
+//          dataContext.put("baseUrl", "/webapp")
+//
+//          val modulesContentMap = new mutable.HashMap[String, String]()
+//          // Для всех модулей на узле мы получаем default content
+//          for (moduleInstance <- matchNode.modules) {
+//            val definition: ModuleDefinition = cmsConfig.moduleDefinitions.get(moduleInstance.getDefinitionId)
+//            val module: IModule = Class.forName(definition.className).getConstructor().newInstance().asInstanceOf[IModule]
+//            val restPath: String = ""
+//            val moduleContext: ModuleContext = new ModuleContext(
+//              moduleInstance,
+//              restPath,
+//              new CmsContext(cmsConfig, matchNode, cfg, dataContext),
+//              definition.attributes
+//            )
+//            val content: String = module.render(moduleContext)
+//            modulesContentMap.put(moduleInstance.instanceId, content)
+//          }
+//
+//          dataContext.put("modulesContentMap", modulesContentMap)
+//
+//          regions.foreach((tuple: (String, String)) => dataContext.put(
+//            "region_" + tuple._1, cfg.getTemplate(tuple._2)
+//          ))
+//
+//          ftlTemplate.process(dataContext, response.getWriter)
+//        }
+//      }
+//      case "POST" => (request: HttpServletRequest, response: HttpServletResponse) => {
+//        if (matchNode == null || matchNode.template == null || matchNode.modules == null) {
+//          response.getWriter.print("Handler not found")
+//        } else {
+//          // todo : pass request to active module if it exists
+//
+//          // fixme: make bestMatch instead of startsWith !
+//          val activeModuleInstance: ModuleInstance = matchNode.modules.find((instance: ModuleInstance) => restPath.startsWith(instance.instanceId))
+//            .last
+//          val modulePath = restPath.substring(activeModuleInstance.instanceId.length)
+//
+//          if (null == activeModuleInstance) {
+//            response.getWriter.print("Handler not found")
+//          } else {
+//            val modulesContentMap = new mutable.HashMap[String, String]()
+//
+//            val templateLoader = new FileTemplateLoader(new File(basedir, "views"))
+//            val cfg = new Configuration()
+//            cfg.setTemplateLoader(templateLoader)
+//
+//            val moduleDefinition: ModuleDefinition = cmsConfig.moduleDefinitions.get(activeModuleInstance.definitionId)
+//            val module: IModule = Class.forName(moduleDefinition.className).getConstructor().newInstance().asInstanceOf[IModule]
+//            val moduleContent: String = module.handleAction(new ModuleContext(
+//              activeModuleInstance, modulePath,
+//              new CmsContext(cmsConfig, matchNode, cfg, null),
+//              moduleDefinition.attributes)
+//            )
+//            modulesContentMap.put(activeModuleInstance.instanceId, moduleContent)
+//
+//            // Для всех остальных модулей на узле мы получаем default content
+//            for (moduleInstance <- matchNode.modules if moduleInstance != activeModuleInstance) {
+//              val definition: ModuleDefinition = cmsConfig.moduleDefinitions.get(moduleInstance.getDefinitionId)
+//              val module: IModule = Class.forName(definition.className).getConstructor().newInstance().asInstanceOf[IModule]
+//              val restPath: String = ""
+//              val moduleContext: ModuleContext = new ModuleContext(
+//                moduleInstance,
+//                restPath,
+//                new CmsContext(cmsConfig, matchNode, cfg, null),
+//                definition.attributes
+//              )
+//              val content: String = module.render(moduleContext)
+//              modulesContentMap.put(moduleInstance.instanceId, content)
+//            }
+//          }
+//        }
+//      }
+//      case _ => (request: HttpServletRequest, response: HttpServletResponse) => {
+//        response.getWriter.print("Handler not found")
+//      }
+//    }
+//    handler(req, resp)
   }
 }
