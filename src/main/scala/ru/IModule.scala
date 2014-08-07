@@ -10,23 +10,11 @@ import freemarker.template.Configuration
 import scala.collection.immutable.HashMap
 
 /**
- * @author igor.kostromin
- *         07.07.2014 23:07
- */
-class CmsContext(var cmsConfig: CmsConfig,
-                    var node: Node,
-                    var freemarkerConfiguration: Configuration,
-                    var baseUrl: String,
-                    var matchedPath: String,
-                    var rawRequest : HttpServletRequest) {
-}
-
-/**
+ * Common modules context (both active and inactive).
  *
- * @param moduleInstance
- *
- * @param cmsContext
- * @param attributes
+ * @param moduleInstance reference to module instance info
+ * @param cmsContext cmsContext available
+ * @param attributes attributes merged from ModuleDefinition and ModuleInstance
  */
 class ModuleContext(var moduleInstance: ModuleInstance,
                      var cmsContext: CmsContext,
@@ -41,6 +29,8 @@ class ModuleContext(var moduleInstance: ModuleInstance,
 }
 
 /**
+ * Context of active module.
+ *
  * @param path Путь текущего запроса относительно модуля
  *             (при вызове render - всё, что дальше nodeUrlPrefix,
  *             при вызове handleAction - всё, что дальше nodeUrlPrefix/moduleInstanceId)
