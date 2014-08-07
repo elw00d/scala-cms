@@ -6,6 +6,8 @@ import scala.beans.BeanProperty
 import scala.collection.immutable.HashMap
 
 /**
+ * CMS configuration deserialized form json config file.
+ *
  * @author igor.kostromin
  *         05.07.2014 19:23
  */
