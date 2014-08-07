@@ -201,11 +201,12 @@ class RootServlet extends HttpServlet {
 
     // Рендерим модули
     val modulesContentMap = new mutable.HashMap[String, String]()
+    var responseMutator: (HttpServletResponse) => Unit = null
     if (null != activeModuleInstance) {
       val modulePath = normalize(restPath.substring(activeModuleInstance.instanceId.length))
       val moduleDefinition: ModuleDefinition = cmsConfig.moduleDefinitions.get(activeModuleInstance.definitionId)
       val module: IModule = Class.forName(moduleDefinition.className).getConstructor().newInstance().asInstanceOf[IModule]
-      val moduleContent: String = module.service(
+      val moduleResult: ModuleResult = module.service(
         new ModuleContext(
           activeModuleInstance,
           new CmsContext(cmsConfig, matchNode, cfg, baseUrl, matchedPath, req),
@@ -213,7 +214,12 @@ class RootServlet extends HttpServlet {
         ),
         new ActiveModuleContext(modulePath, method, req.getParameterMap)
       )
-      modulesContentMap.put(activeModuleInstance.instanceId, moduleContent)
+      moduleResult match {
+        case result: ContentResult =>
+          modulesContentMap.put(activeModuleInstance.instanceId, result.content)
+        case result: DirectResponseResult =>
+          responseMutator = result.responseMutator
+      }
     }
     // Для всех остальных модулей на узле мы получаем default content
     for (moduleInstance <- matchNode.modules if moduleInstance != activeModuleInstance) {
@@ -224,16 +230,25 @@ class RootServlet extends HttpServlet {
         new CmsContext(cmsConfig, matchNode, cfg, baseUrl, matchedPath, req),
         definition.attributes
       )
-      val content: String = module.service(moduleContext, null)
-      modulesContentMap.put(moduleInstance.instanceId, content)
+      val moduleResult: ModuleResult = module.service(moduleContext, null)
+      moduleResult match {
+        case result: ContentResult =>
+          modulesContentMap.put(moduleInstance.instanceId, result.content)
+        case result: DirectResponseResult =>
+          responseMutator = result.responseMutator
+      }
     }
 
-    dataContext.put("modulesContentMap", modulesContentMap)
+    if (responseMutator != null) {
+      responseMutator(resp)
+    } else {
+      dataContext.put("modulesContentMap", modulesContentMap)
 
-    regions.foreach((tuple: (String, String)) => dataContext.put(
-      "region_" + tuple._1, cfg.getTemplate(tuple._2)
-    ))
+      regions.foreach((tuple: (String, String)) => dataContext.put(
+        "region_" + tuple._1, cfg.getTemplate(tuple._2)
+      ))
 
-    ftlTemplate.process(dataContext, resp.getWriter)
+      ftlTemplate.process(dataContext, resp.getWriter)
+    }
   }
 }
