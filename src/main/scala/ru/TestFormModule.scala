@@ -10,24 +10,16 @@ import freemarker.template.SimpleScalar
  *         06.08.2014 13:59
  */
 class TestFormModule extends IModule {
-  override def render(moduleContext: ModuleContext): String = {
-    System.out.println("modulePath: " + moduleContext.path)
+  override def service(moduleContext: ModuleContext, activeModuleContext: ActiveModuleContext): String = {
+    if (activeModuleContext != null) {
+      System.out.println("modulePath: " + activeModuleContext.path)
+      return "Action!"
+    }
     val template: freemarker.template.Template = moduleContext.cmsContext.freemarkerConfiguration.getTemplate("testFormModule.ftl")
     val dataContext = new util.HashMap[String, Object]()
-    // todo : make this sweet
-    dataContext.put("baseModuleUrl",
-      moduleContext.cmsContext.dataContext.get("baseUrl").asInstanceOf[String] +
-        "/" +
-      moduleContext.cmsContext.dataContext.get("matchedPath").asInstanceOf[String] +
-        "/" +
-      moduleContext.moduleInstance.instanceId
-    )
+    dataContext.put("baseModuleUrl", moduleContext.baseModuleUrl)
     val stringWriter = new StringWriter()
     template.process(dataContext, stringWriter)
     stringWriter.toString
-  }
-
-  override def handleAction(moduleContext: ModuleContext): String = {
-    "Action !"
   }
 }
