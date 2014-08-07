@@ -17,6 +17,7 @@ class TestFormModule extends IModule {
     // todo : make this sweet
     dataContext.put("baseModuleUrl",
       moduleContext.cmsContext.dataContext.get("baseUrl").asInstanceOf[String] +
+        "/" +
       moduleContext.cmsContext.dataContext.get("matchedPath").asInstanceOf[String] +
         "/" +
       moduleContext.moduleInstance.instanceId
@@ -27,6 +28,6 @@ class TestFormModule extends IModule {
   }
 
   override def handleAction(moduleContext: ModuleContext): String = {
-    ""
+    "Action !"
   }
 }
