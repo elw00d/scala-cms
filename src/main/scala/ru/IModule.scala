@@ -63,9 +63,9 @@ trait IModule {
 }
 
 // Тестовый модуль для демонстрации возможностей cmsContext
-class CurrentNodeModule extends IModule {
-  override def service(moduleContext: ModuleContext, activeModuleContext: ActiveModuleContext): ModuleResult = {
-    new ContentResult(moduleContext.cmsContext.node.urlPrefix)
-  }
-}
+//class CurrentNodeModule extends IModule {
+//  override def service(moduleContext: ModuleContext, activeModuleContext: ActiveModuleContext): ModuleResult = {
+//    new ContentResult(moduleContext.cmsContext.node.urlPrefix)
+//  }
+//}
 

@@ -40,6 +40,7 @@ class Node(@BeanProperty var urlPrefix: String,
            @BeanProperty var nodes: Array[Node],
             @BeanProperty var attributes: java.util.HashMap[String, Object],
             @BeanProperty var modules: Array[ModuleInstance]) {
+  override def toString: String = urlPrefix
 }
 
 class Template(@BeanProperty var id: String,
