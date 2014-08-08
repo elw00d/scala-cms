@@ -1,6 +1,6 @@
 package ru
 
-import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.{HttpSession, HttpServletResponse, HttpServletRequest}
 
 import freemarker.template.Configuration
 
@@ -15,5 +15,7 @@ class CmsContext(var cmsConfig: CmsConfig,
                     var freemarkerConfiguration: Configuration,
                     var baseUrl: String,
                     var matchedPath: String,
-                    var rawRequest : HttpServletRequest) {
+                    var rawRequest : HttpServletRequest,
+                  var rawResponse: HttpServletResponse,
+                  var session: HttpSession) {
 }

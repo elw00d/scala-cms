@@ -19,7 +19,7 @@ import scala.io.{Source, BufferedSource}
  * @author igor.kostromin
  *         28.06.2014 10:55
  */
-@WebServlet(value=Array("/"), name = "rootServlet")
+//@WebServlet(value=Array("/cms"), name = "rootServlet")
 class RootServlet extends HttpServlet {
   def normalize(path: String): String = {
     path.split("/").filter(!_.isEmpty).mkString("/")
@@ -209,7 +209,7 @@ class RootServlet extends HttpServlet {
       val moduleResult: ModuleResult = module.service(
         new ModuleContext(
           activeModuleInstance,
-          new CmsContext(cmsConfig, matchNode, cfg, baseUrl, matchedPath, req),
+          new CmsContext(cmsConfig, matchNode, cfg, baseUrl, matchedPath, req, resp, req.getSession),
           moduleDefinition.attributes
         ),
         new ActiveModuleContext(modulePath, method, req.getParameterMap)
@@ -227,7 +227,7 @@ class RootServlet extends HttpServlet {
       val module: IModule = Class.forName(definition.className).getConstructor().newInstance().asInstanceOf[IModule]
       val moduleContext: ModuleContext = new ModuleContext(
         moduleInstance,
-        new CmsContext(cmsConfig, matchNode, cfg, baseUrl, matchedPath, req),
+        new CmsContext(cmsConfig, matchNode, cfg, baseUrl, matchedPath, req, resp, req.getSession),
         definition.attributes
       )
       val moduleResult: ModuleResult = module.service(moduleContext, null)

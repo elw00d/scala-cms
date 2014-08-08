@@ -1,0 +1,44 @@
+<window xmlns="http://www.zkoss.org/2005/zul"
+        title="My First ZK Application" border="normal"
+        apply="org.zkoss.bind.BindComposer"
+        viewModel="@id('mainVm') @init('ru.MainVm')"
+        id="win">
+   <style>
+    .h-inline-block {
+        display: inline-block;
+        _display: inline;
+    }
+    </style>
+    <panel title="Splitter" border="normal" width="100%" >
+        <panelchildren>
+            <hbox spacing="0" width="20%" height="100%">
+                <vbox spacing="0" width="100%" heights="130px,130px">
+                    <tree id="tree" model="@load(mainVm.treeVm)" selectedItem="@save(mainVm.currentItemVm.treeItem)">
+                        <template name="model">
+                            <treeitem context="treePopup">
+                                <treerow>
+                                    <treecell label="${each.toString()}">
+                                        <!--<image src="/widgets/menu/context_menu/img/msn2.gif" />-->
+                                    </treecell>
+                                </treerow>
+                            </treeitem>
+                        </template>
+                    </tree>
+                    <menupopup id="treePopup">
+                        <menuitem onClick="@command('add')" disabled="@load(!mainVm.canExecute('add'))" label="Add" />
+                        <menuitem onClick="@command('edit')" label="Edit" />
+                        <menuseparator />
+                        <menuitem label="Delete" />
+                    </menupopup>
+                </vbox>
+                <splitter id="s2" collapse="before"/>
+
+                <label value="Url prefix" width="150px" />
+                <label value="@bind(mainVm.currentItemVm.urlPrefix)" width="150px" />
+
+                <label value="Item:" width="150px" />
+                <label value="@bind(mainVm.currentItemVm.treeItem)" width="150px" />
+            </hbox>
+        </panelchildren>
+    </panel>
+</window>
