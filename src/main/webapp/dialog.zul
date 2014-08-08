@@ -1,3 +1,8 @@
-<zk xmlns="http://www.zkoss.org/2005/zul">
-    <label value="${arg.name}"></label>
-</zk>
+<window xmlns="http://www.zkoss.org/2005/zul"
+        apply="org.zkoss.bind.BindComposer"
+        closable="true"
+        position="center"
+        width="50%"
+        title="Edit">
+    <include node="@ref(arg.node)" src="node-edit.zul"/>
+</window>

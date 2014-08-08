@@ -1,0 +1,20 @@
+<grid xmlns="http://www.zkoss.org/2005/zul">
+    <columns>
+        <column label="Type" width="120px" />
+        <column label="Content" />
+    </columns>
+    <rows>
+        <row>
+            <label value="Url prefix" width="150px" />
+            <hlayout>
+                <textbox value="@bind(node.urlPrefix)" width="150px" />
+            </hlayout>
+        </row>
+        <row>
+            <label value="Template" width="150px" />
+            <hlayout>
+                <textbox value="@bind(node.template)" width="150px" />
+            </hlayout>
+        </row>
+    </rows>
+</grid>

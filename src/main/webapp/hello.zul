@@ -9,11 +9,11 @@
         _display: inline;
     }
     </style>
-    <panel title="Splitter" border="normal" width="100%" >
+    <panel title="Splitter" border="normal" width="100%" height="100%" >
         <panelchildren>
-            <hbox spacing="0" width="20%" height="100%">
-                <vbox spacing="0" width="100%" heights="130px,130px">
-                    <tree id="tree" model="@load(mainVm.treeVm)" selectedItem="@save(mainVm.currentItemVm.treeItem)">
+            <hbox spacing="0" widths="20%,100%" height="100%">
+                <vbox spacing="0" width="100%" height="100%">
+                    <tree id="tree" model="@load(mainVm.treeVm)" selectedItem="@save(mainVm.currentItemVm)">
                         <template name="model">
                             <treeitem context="treePopup">
                                 <treerow>
@@ -33,11 +33,27 @@
                 </vbox>
                 <splitter id="s2" collapse="before"/>
 
-                <label value="Url prefix" width="150px" />
-                <label value="@bind(mainVm.currentItemVm.urlPrefix)" width="150px" />
-
-                <label value="Item:" width="150px" />
-                <label value="@bind(mainVm.currentItemVm.treeItem)" width="150px" />
+                <include node="@ref(mainVm.currentItemVm)" src="node-edit.zul"/>
+                <!--<grid>
+                    <columns>
+                        <column width="120px" />
+                        <column />
+                    </columns>
+                    <rows>
+                        <row>
+                            <label value="Url prefix" width="150px" />
+                            <hlayout>
+                                <textbox value="@bind(mainVm.currentItemVmVm.node.urlPrefix)" width="150px" />
+                            </hlayout>
+                        </row>
+                        <row>
+                            <label value="Template" width="150px" />
+                            <hlayout>
+                                <textbox value="@bind(mainVm.currentItemVmVm.node.template)" width="150px" />
+                            </hlayout>
+                        </row>
+                    </rows>
+                </grid>-->
             </hbox>
         </panelchildren>
     </panel>
