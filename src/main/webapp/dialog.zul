@@ -1,8 +1,10 @@
 <window xmlns="http://www.zkoss.org/2005/zul"
+        id="dlg"
         apply="org.zkoss.bind.BindComposer"
+        viewModel="@id('vm') @init('ru.DialogVm')"
         closable="true"
         position="center"
         width="50%"
         title="Edit">
-    <include node="@ref(arg.node)" src="node-edit.zul"/>
+    <include vm="@ref(arg.nodeVm)" src="node-edit.zul"/>
 </window>
