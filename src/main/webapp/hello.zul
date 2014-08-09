@@ -33,27 +33,7 @@
                 </vbox>
                 <splitter id="s2" collapse="before"/>
 
-                <include node="@ref(mainVm.currentItemVm)" src="node-edit.zul"/>
-                <!--<grid>
-                    <columns>
-                        <column width="120px" />
-                        <column />
-                    </columns>
-                    <rows>
-                        <row>
-                            <label value="Url prefix" width="150px" />
-                            <hlayout>
-                                <textbox value="@bind(mainVm.currentItemVmVm.node.urlPrefix)" width="150px" />
-                            </hlayout>
-                        </row>
-                        <row>
-                            <label value="Template" width="150px" />
-                            <hlayout>
-                                <textbox value="@bind(mainVm.currentItemVmVm.node.template)" width="150px" />
-                            </hlayout>
-                        </row>
-                    </rows>
-                </grid>-->
+                <include vm="@ref(mainVm.currentItemVmVm)" src="node-edit.zul"/>
             </hbox>
         </panelchildren>
     </panel>

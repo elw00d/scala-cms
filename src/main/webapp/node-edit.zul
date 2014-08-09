@@ -1,20 +1,30 @@
-<grid xmlns="http://www.zkoss.org/2005/zul">
+<grid xmlns="http://www.zkoss.org/2005/zul"
+        form="@id('fx') @load(vm.node) @save(vm.node, before='submit')"
+        >
     <columns>
         <column label="Type" width="120px" />
-        <column label="Content" />
+        <!--<column label="Content"/>-->
+        <!--form="@id('fx') @load(vm.node) @save(vm.node, before='submit')"-->
+        <column label="@load(fxStatus.dirty?'Content *':'Content')" />
     </columns>
     <rows>
         <row>
             <label value="Url prefix" width="150px" />
             <hlayout>
-                <textbox value="@bind(node.urlPrefix)" width="150px" />
+                <textbox value="@bind(fx.urlPrefix)" width="150px" />
             </hlayout>
         </row>
         <row>
             <label value="Template" width="150px" />
             <hlayout>
-                <textbox value="@bind(node.template)" width="150px" />
+                <textbox value="@bind(fx.template)" width="150px" />
             </hlayout>
+        </row>
+        <row>
+            <!-- 1. Нельзя устанавливать BindingComposer, с ним не работает байндинг команды -->
+            <!-- 2. Эта команда ссылается на внешнюю ViewModel -->
+            <button label="Submit" onClick="@command('submit')"
+                    disabled="@load(!mainVm.canExecute('submit'))"/>
         </row>
     </rows>
 </grid>
