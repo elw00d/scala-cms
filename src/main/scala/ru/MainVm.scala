@@ -44,6 +44,8 @@ class MainVm {
   var currentItemVm: Node = null
   @BeanProperty var currentItemVmVm: NodeVm = new NodeVm()
 
+  var newItemVm: NodeVm = null
+
   def getCurrentItemVm: Node = currentItemVm
   def setCurrentItemVm(node: Node): Unit = {
     currentItemVm = node
@@ -75,6 +77,13 @@ class MainVm {
   @Command(Array("add"))
   def add() {
     System.out.println("Add command")
+    val dataArgs: util.HashMap[String, Object] = new util.HashMap[String, Object]()
+    newItemVm = new NodeVm(new Node("", "", Array(), new util.HashMap[String, Object](), Array()))
+    dataArgs.put("nodeVm", newItemVm)
+    dataArgs.put("title", "Add node")
+    val dlg = Executions.createComponents("/dialog.zul", win, dataArgs).asInstanceOf[Window]
+    win.addEventListener("onDlgClosed", new CloseEventListener[Event]())
+    dlg.doModal()
   }
 
   @Command(Array("edit"))
@@ -95,7 +104,17 @@ class MainVm {
     override def onEvent(event: T): Unit = {
       //System.out.println("onClosed!!!!!!")
       // Чтобы в форме справа отразились изменения, сделанные в диалоговом окне
-      BindUtils.postNotifyChange(null, null, MainVm.this, "currentItemVmVm")
+      if (MainVm.this.newItemVm != null) {
+        if (currentItemVm.nodes == null) {
+          currentItemVm.nodes = Array()
+        }
+        currentItemVm.nodes +:= newItemVm.node
+        newItemVm = null
+        // Обновляем treeVm, чтобы дерево показало добавленный элемент
+        BindUtils.postNotifyChange(null, null, MainVm.this, "treeVm")
+      } else {
+        BindUtils.postNotifyChange(null, null, MainVm.this, "currentItemVmVm")
+      }
     }
   }
 
@@ -109,6 +128,11 @@ class MainVm {
   @Command(Array("submit"))
   def submit() = {
     System.out.println("MainVm.submit()")
+  }
+
+  @Command(Array("saveConfig"))
+  def saveConfig() = {
+    System.out.println("saveConfig()")
   }
 }
 
