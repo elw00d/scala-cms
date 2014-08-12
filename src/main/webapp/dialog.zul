@@ -5,6 +5,6 @@
         closable="true"
         position="center"
         width="50%"
-        title="Edit">
+        title="@load(not empty arg.title ? arg.title : 'Edit')">
     <include vm="@ref(arg.nodeVm)" src="node-edit.zul"/>
 </window>
