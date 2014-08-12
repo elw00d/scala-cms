@@ -134,6 +134,11 @@ class MainVm {
   def saveConfig() = {
     System.out.println("saveConfig()")
   }
+
+  @Command(Array("cancelSave"))
+  def cancelSave() = {
+    System.out.println("cancelSave()")
+  }
 }
 
 class DialogVm {
