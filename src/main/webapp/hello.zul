@@ -1,19 +1,41 @@
 <window xmlns="http://www.zkoss.org/2005/zul"
-        title="My First ZK Application" border="normal"
+        title="Scala CMS" border="normal"
         apply="org.zkoss.bind.BindComposer"
         viewModel="@id('mainVm') @init('ru.MainVm')"
         id="win" height="100%">
-   <style>
-    .h-inline-block {
-        display: inline-block;
-        _display: inline;
-    }
-    </style>
-    <panel title="Splitter" border="normal" height="100%" >
+    <panel border="normal" height="100%" >
         <panelchildren>
-            <vbox height="100%">
-                <hbox spacing="0" widths="20%,100%" height="100%">
-                    <vbox spacing="0" width="100%" height="100%">
+            <vbox height="100%" heights=",100%,">
+                <hbox>
+                    <menubar id="menubar" autodrop="true">
+                        <menu label="Structure">
+                            <menupopup>
+                                <menuitem label="Nodes"/>
+                                <menuitem label="Templates"/>
+                                <menuitem label="Content"/>
+                            </menupopup>
+                        </menu>
+                        <menu label="Modules">
+                            <menupopup>
+                                <menuitem label="Browsers and Plugins" onClick="alert(self.label)" />
+                                <menuitem label="Firewalls and Security" onClick="alert(self.label)" />
+                                <menuitem label="Audio and Video" onClick="alert(self.label)" />
+                                <menuitem label="Photos and Images" onClick="alert(self.label)" />
+                                <menuitem label="Desktop" onClick="alert(self.label)" />
+                                <menuitem label="Office and News" onClick="alert(self.label)" />
+                                <menuitem label="Developer Tools" onClick="alert(self.label)" />
+                                <menuitem label="Others" onClick="alert(self.label)" />
+                            </menupopup>
+                        </menu>
+                        <menu label="Files" onClick="alert(self.label)">
+                        </menu>
+                        <menu label="Logs" onClick="alert(self.label)">
+                        </menu>
+                        <menuitem label="Log out" onClick="alert(self.label)" />
+                    </menubar>
+                </hbox>
+                <hbox height="100%" widths="25%,">
+                    <vbox width="100%" height="100%">
                         <tree id="tree" model="@load(mainVm.treeVm)" selectedItem="@save(mainVm.currentItemVm)">
                             <template name="model">
                                 <treeitem context="treePopup" draggable="true" droppable="true">
@@ -32,13 +54,14 @@
                             <menuitem label="Delete" />
                         </menupopup>
                     </vbox>
-                    <splitter id="s2" />
-
-                    <hbox width="25%">
-                        <include vm="@ref(mainVm.currentItemVmVm)" src="node-edit.zul"/>
-                    </hbox>
+                    <splitter id="s2" collapse="before" />
+                    <include vm="@ref(mainVm.currentItemVmVm)" src="node-edit.zul"/>
                 </hbox>
-                <button label="Save" onClick="@command('saveConfig')"/>
+                <splitter collapse="after"/>
+                <hbox>
+                    <button label="Save" onClick="@command('saveConfig')"/>
+                    <button label="Cancel" onClick="@command('cancelSave')"/>
+                </hbox>
             </vbox>
         </panelchildren>
     </panel>
