@@ -18,14 +18,14 @@ class TreeVm(var root: Node) extends AbstractTreeModel[Node](root) {
   }
 
   override def getChild(parent: Node, index: Int): Node = {
-    try {
+    //try {
       parent.nodes(index)
-    } catch {
-      case e: ArrayIndexOutOfBoundsException => {
-        System.out.println("ArrayIndexOutOfBoundsException")
-        return null
-      }
-    }
+//    } catch {
+//      case e: ArrayIndexOutOfBoundsException => {
+//        System.out.println("ArrayIndexOutOfBoundsException")
+//        return null
+//      }
+//    }
   }
 
   override def getChildCount(parent: Node): Int = {

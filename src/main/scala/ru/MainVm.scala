@@ -44,7 +44,13 @@ class NodeVm {
 
 class MainVm {
   @BeanProperty var treeVm: TreeVm = null
+  // Это св-во отражает текущий selectedItem дерева
   var currentItemVm: Node = null
+  // А это св-во содержит враппер для selectedItem, который редактируется
+  // details-представлением node-edit.zul. При изменении selectedItem дерева
+  // изменяется currentItemVm, вызывается метод setCurrentItemVm, в котором мы
+  // явно вызываем notifyChange("currentItemVmVm") чтобы дочернее представление
+  // обновило данные
   @BeanProperty var currentItemVmVm: NodeVm = new NodeVm()
 
   var newItemVm: NodeVm = null
@@ -198,10 +204,18 @@ class MainVm {
       for ( i <- 0 to pathInts.size() - 1) {
         ints(i) = pathInts.get(i)
       }
-      treeVm.fireEvent(TreeDataEvent.INTERVAL_REMOVED,
-        ints,
-        index,
-        index)
+//      treeVm.fireEvent(TreeDataEvent.INTERVAL_REMOVED,
+//        ints,
+//        index,
+//        index+1)
+      treeVm.fireEvent(parentNode, index, index, TreeDataEvent.INTERVAL_REMOVED)
+      // Очищаем selection, т.к. fireEvent почему-то не исправляет selectionPath внутри
+      // AbstractTreeModel (а должно по идее) в случае удаления последнего элемента
+      // todo : оформить багрепорт в ZK
+      treeVm.clearSelection()
+      // todo : убрать это, когда ZK Tree научится понимать, что при clearSelection()
+      // нужно еще и selectedItem обновлять в null
+      setCurrentItemVm(null)
     }
   }
 }
