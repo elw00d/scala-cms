@@ -51,7 +51,7 @@
                             <menuitem onClick="@command('add')" disabled="@load(!mainVm.canExecute('add'))" label="Add" />
                             <menuitem onClick="@command('edit')" label="Edit" />
                             <menuseparator />
-                            <menuitem label="Delete" />
+                            <menuitem onClick="@command('delete')" label="Delete" />
                         </menupopup>
                     </vbox>
                     <splitter id="s2" collapse="before" />
