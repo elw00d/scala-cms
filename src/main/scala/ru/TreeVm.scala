@@ -3,7 +3,7 @@ package ru
 import java.io.File
 
 import com.google.gson.Gson
-import org.zkoss.zul.AbstractTreeModel
+import org.zkoss.zul.{DefaultTreeModel, AbstractTreeModel}
 import org.zkoss.zul.ext.TreeSelectableModel
 
 import scala.io.{Source, BufferedSource}
@@ -18,7 +18,14 @@ class TreeVm(var root: Node) extends AbstractTreeModel[Node](root) {
   }
 
   override def getChild(parent: Node, index: Int): Node = {
-    parent.nodes(index)
+    try {
+      parent.nodes(index)
+    } catch {
+      case e: ArrayIndexOutOfBoundsException => {
+        System.out.println("ArrayIndexOutOfBoundsException")
+        return null
+      }
+    }
   }
 
   override def getChildCount(parent: Node): Int = {
