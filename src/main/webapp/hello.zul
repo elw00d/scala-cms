@@ -38,8 +38,8 @@
                     <vbox width="100%" height="100%">
                         <tree id="tree" model="@load(mainVm.treeVm)" selectedItem="@save(mainVm.currentItemVm)">
                             <template name="model">
-                                <treeitem context="treePopup" draggable="true" droppable="true">
-                                    <treerow>
+                                <treeitem context="treePopup">
+                                    <treerow onDrop="@command('drop', event=event)" draggable="true" droppable="true">
                                         <treecell label="${each.toString()}">
                                             <!--<image src="/widgets/menu/context_menu/img/msn2.gif" />-->
                                         </treecell>

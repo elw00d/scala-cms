@@ -8,12 +8,12 @@ import java.util
 import com.google.gson.{GsonBuilder, Gson}
 import org.zkoss.bind.BindUtils
 import org.zkoss.bind.annotation._
-import org.zkoss.zk.ui.event.{Events, Event, EventListener}
+import org.zkoss.zk.ui.event.{DropEvent, Events, Event, EventListener}
 import org.zkoss.zk.ui.select.Selectors
 import org.zkoss.zk.ui.{Component, Executions}
 import org.zkoss.zk.ui.select.annotation.Wire
 import org.zkoss.zul.event.TreeDataEvent
-import org.zkoss.zul.{Messagebox, Window}
+import org.zkoss.zul._
 
 import scala.beans.BeanProperty
 import scala.io.{Source, BufferedSource}
@@ -157,39 +157,83 @@ class MainVm {
     BindUtils.postNotifyChange(null, null, this, "treeVm")
   }
 
-  @Command(Array("delete"))
-  def deleteNode() = {
-    var path: java.util.List[Node] = new util.ArrayList[Node]()
-    var pathInts: java.util.List[Int] = new util.ArrayList[Int]()
+  @Command(Array("drop"))
+  def drop(@BindingParam("event") event: Event) = {
+    System.out.println("drop command")
+    // The dragged target is a TreeRow belongs to an
+    // Treechildren of TreeItem.
+    val draggedItem: Treeitem = event.asInstanceOf[DropEvent].getDragged.getParent.asInstanceOf[Treeitem]
+    val draggedNode: Node = draggedItem.getValue[Node]
+    val parentItem: Treeitem = event.getTarget.getParent.asInstanceOf[Treeitem]
+    val parentResult: (Node, Array[Int]) = getParentNode(treeVm.root, draggedNode)
+    val oldParent: Node = parentResult._1
 
-    def getParentNode(parentNode: Node, node: Node): Node = {
+    val index: Int = oldParent.nodes.indexOf(draggedNode)
+    oldParent.nodes = oldParent.nodes.filter(_ != draggedNode)
+    treeVm.fireEvent(oldParent, index, index, TreeDataEvent.INTERVAL_REMOVED)
+
+    val node: Node = parentItem.getValue[Node]
+    if (node.nodes == null)
+      node.nodes = Array()
+    node.nodes +:= draggedNode
+    treeVm.fireEvent(node, 0, 0, TreeDataEvent.INTERVAL_ADDED)
+
+    val list: util.ArrayList[Node] = new util.ArrayList[Node]()
+    list.add(draggedNode)
+    treeVm.setSelection(list)
+    //BindUtils.postNotifyChange(null, null, this, "treeVm")
+  }
+
+  def getParentNode(parentNode: Node, node: Node): (Node, Array[Int]) = {
+    val path: java.util.List[Node] = new util.ArrayList[Node]()
+    val pathInts: java.util.List[Int] = new util.ArrayList[Int]()
+
+    def getParentNodeInner(parentNode: Node, node: Node): Node = {
       if (path.isEmpty) {
         pathInts.add(0)
       } else {
-        pathInts.add(path.get(path.size()- 1).nodes.indexOf(parentNode))
+        pathInts.add(path.get(path.size() - 1).nodes.indexOf(parentNode))
       }
-      path.add(parentNode)
+      //path.add(parentNode)
 
       if (parentNode.nodes != null) {
         val matchOption: Option[Node] = parentNode.nodes.filter((n: Node) => n == node).lastOption
         if (matchOption.nonEmpty)
           return parentNode
 
-        var parentInChilds : Node = null
+        var parentInChilds: Node = null
         parentNode.nodes.foreach((n: Node) => {
-          val foundParent: Node = getParentNode(n, node)
+          val foundParent: Node = getParentNodeInner(n, node)
           if (foundParent != null)
             parentInChilds = foundParent
         })
-        if (parentInChilds == null)
-          path.remove(parentNode)
+        if (parentInChilds == null) {
+          //path.remove(parentNode)
+          pathInts.remove(pathInts.size() - 1)
+        }
         return parentInChilds
       }
-      path.remove(parentNode)
+      //path.remove(parentNode)
+      pathInts.remove(pathInts.size() - 1)
       null
     }
 
-    val parentNode: Node = getParentNode(treeVm.root, currentItemVm)
+    val parent: Node = getParentNodeInner(parentNode, node)
+    val ints: Array[Int] = new Array[Int](pathInts.size())
+    for ( i <- 0 to pathInts.size() - 1) {
+      ints(i) = pathInts.get(i)
+    }
+    (parent, ints)
+  }
+
+  @Command(Array("delete"))
+  def deleteNode() = {
+    //var path: java.util.List[Node] = new util.ArrayList[Node]()
+    //var pathInts: java.util.List[Int] = new util.ArrayList[Int]()
+
+    val parentResult: (Node, Array[Int]) = getParentNode(treeVm.root, currentItemVm)
+    val parentNode: Node = parentResult._1
+    val pathInts = parentResult._2
     System.out.println("Parent node: " + parentNode)
 
     if (parentNode == treeVm.getRoot) {
@@ -200,15 +244,11 @@ class MainVm {
       val index: Int = parentNode.nodes.indexOf(currentItemVm)
       parentNode.nodes = parentNode.nodes.filter(_ != currentItemVm)
       BindUtils.postNotifyChange(null, null, this, "treeVm")
-      val ints: Array[Int] = new Array[Int](pathInts.size())
-      for ( i <- 0 to pathInts.size() - 1) {
-        ints(i) = pathInts.get(i)
-      }
-//      treeVm.fireEvent(TreeDataEvent.INTERVAL_REMOVED,
-//        ints,
-//        index,
-//        index+1)
-      treeVm.fireEvent(parentNode, index, index, TreeDataEvent.INTERVAL_REMOVED)
+      treeVm.fireEvent(TreeDataEvent.INTERVAL_REMOVED,
+        pathInts,
+        index,
+        index)
+      //treeVm.fireEvent(parentNode, index, index, TreeDataEvent.INTERVAL_REMOVED)
       // Очищаем selection, т.к. fireEvent почему-то не исправляет selectionPath внутри
       // AbstractTreeModel (а должно по идее) в случае удаления последнего элемента
       // todo : оформить багрепорт в ZK
