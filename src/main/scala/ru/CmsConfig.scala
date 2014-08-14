@@ -41,6 +41,29 @@ class Node(@BeanProperty var urlPrefix: String,
             @BeanProperty var attributes: java.util.HashMap[String, Object],
             @BeanProperty var modules: Array[ModuleInstance]) {
   override def toString: String = urlPrefix
+
+  def isParentOf(node: Node) : Boolean = {
+    if (nodes == null) return false
+
+    var found: Boolean = false
+    def searchRecursive(currentParent: Node): Unit = {
+      if (currentParent.nodes != null) {
+        for (child <- currentParent.nodes) {
+          if (found) return
+          else {
+            if (child == node) {
+              found = true
+              return
+            }
+            searchRecursive(child)
+          }
+        }
+      }
+    }
+
+    searchRecursive(this)
+    found
+  }
 }
 
 class Template(@BeanProperty var id: String,
