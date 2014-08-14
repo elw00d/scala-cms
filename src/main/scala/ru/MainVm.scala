@@ -158,34 +158,40 @@ class MainVm {
   }
 
   @Command(Array("drop"))
-  def drop(@BindingParam("event") event: Event) = {
+  def drop(@BindingParam("event") event: Event): Unit = {
     val draggedItem: Treeitem = event.asInstanceOf[DropEvent].getDragged.getParent.asInstanceOf[Treeitem]
     val draggedNode: Node = draggedItem.getValue[Node]
-    val parentItem: Treeitem = event.getTarget.getParent.asInstanceOf[Treeitem]
+    val targetNode: Node = event.getTarget.getParent.asInstanceOf[Treeitem].getValue[Node]
     val parentResult: (Node, Array[Int]) = getParentNode(treeVm.root, draggedNode)
-    val oldParent: Node = parentResult._1
+    val draggedNodeParent: Node = parentResult._1
+
+    if (draggedNode.isParentOf(targetNode)) {
+      Messagebox.show("Can't move node into themself", "Error", Array(Messagebox.Button.OK),
+        Messagebox.EXCLAMATION, Messagebox.Button.OK, null)
+      return
+    }
 
     // Уведомляем дерево об удалении элемента - для перерисовки без полного обновления байндинга treeVm
-    val index: Int = oldParent.nodes.indexOf(draggedNode)
-    oldParent.nodes = oldParent.nodes.filter(_ != draggedNode)
-    treeVm.fireEvent(oldParent, index, index, TreeDataEvent.INTERVAL_REMOVED)
+    val index: Int = draggedNodeParent.nodes.indexOf(draggedNode)
+    draggedNodeParent.nodes = draggedNodeParent.nodes.filter(_ != draggedNode)
+    treeVm.fireEvent(draggedNodeParent, index, index, TreeDataEvent.INTERVAL_REMOVED)
 
     // Уведомляем дерево о том, что родительская нода стала пустой (чтобы убралась открытая стрелочка)
-    if (oldParent.nodes.length == 0) {
-      val parentParentResult: (Node, Array[Int]) = getParentNode(treeVm.root, oldParent)
+    if (draggedNodeParent.nodes.length == 0) {
+      val parentParentResult: (Node, Array[Int]) = getParentNode(treeVm.root, draggedNodeParent)
 
       treeVm.fireEvent(parentParentResult._1,
-        parentParentResult._1.nodes.indexOf(oldParent),
-        parentParentResult._1.nodes.indexOf(oldParent),
+        parentParentResult._1.nodes.indexOf(draggedNodeParent),
+        parentParentResult._1.nodes.indexOf(draggedNodeParent),
         TreeDataEvent.STRUCTURE_CHANGED)
     }
 
     // Уведомляем дерево о том, что был добавлен элемент
-    val node: Node = parentItem.getValue[Node]
-    if (node.nodes == null)
-      node.nodes = Array()
-    node.nodes +:= draggedNode
-    treeVm.fireEvent(node, 0, 0, TreeDataEvent.INTERVAL_ADDED)
+
+    if (targetNode.nodes == null)
+      targetNode.nodes = Array()
+    targetNode.nodes +:= draggedNode
+    treeVm.fireEvent(targetNode, 0, 0, TreeDataEvent.INTERVAL_ADDED)
 
     // Обновляем выделенный элемент (само дерево почему-то не понимает этого)
     val list: util.ArrayList[Node] = new util.ArrayList[Node]()
@@ -237,9 +243,6 @@ class MainVm {
 
   @Command(Array("delete"))
   def deleteNode() = {
-    //var path: java.util.List[Node] = new util.ArrayList[Node]()
-    //var pathInts: java.util.List[Int] = new util.ArrayList[Int]()
-
     val parentResult: (Node, Array[Int]) = getParentNode(treeVm.root, currentItemVm)
     val parentNode: Node = parentResult._1
     val pathInts = parentResult._2
@@ -250,14 +253,25 @@ class MainVm {
       Messagebox.show("Can't delete root node")
     } else {
       // todo : confirm
+
       val index: Int = parentNode.nodes.indexOf(currentItemVm)
       parentNode.nodes = parentNode.nodes.filter(_ != currentItemVm)
-      BindUtils.postNotifyChange(null, null, this, "treeVm")
-      treeVm.fireEvent(TreeDataEvent.INTERVAL_REMOVED,
-        pathInts,
-        index,
-        index)
-      //treeVm.fireEvent(parentNode, index, index, TreeDataEvent.INTERVAL_REMOVED)
+//      treeVm.fireEvent(TreeDataEvent.INTERVAL_REMOVED,
+//        pathInts,
+//        index,
+//        index)
+      treeVm.fireEvent(parentNode, index, index, TreeDataEvent.INTERVAL_REMOVED)
+
+      // Уведомляем дерево о том, что родительская нода стала пустой (чтобы убралась открытая стрелочка)
+      if (parentNode.nodes.length == 0) {
+        val parentParentResult: (Node, Array[Int]) = getParentNode(treeVm.root, parentNode)
+
+        treeVm.fireEvent(parentParentResult._1,
+          parentParentResult._1.nodes.indexOf(parentNode),
+          parentParentResult._1.nodes.indexOf(parentNode),
+          TreeDataEvent.STRUCTURE_CHANGED)
+      }
+
       // Очищаем selection, т.к. fireEvent почему-то не исправляет selectionPath внутри
       // AbstractTreeModel (а должно по идее) в случае удаления последнего элемента
       // todo : оформить багрепорт в ZK
