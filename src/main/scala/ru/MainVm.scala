@@ -127,7 +127,8 @@ class MainVm {
 
   @Command(Array("submit"))
   def submit() = {
-    System.out.println("MainVm.submit()")
+    // Обновляем представление изменённого узла в дереве
+    BindUtils.postNotifyChange(null, null, this, "treeVm")
   }
 
   @Command(Array("saveConfig"))
@@ -153,9 +154,16 @@ class MainVm {
   @Command(Array("delete"))
   def deleteNode() = {
     var path: java.util.List[Node] = new util.ArrayList[Node]()
+    var pathInts: java.util.List[Int] = new util.ArrayList[Int]()
 
     def getParentNode(parentNode: Node, node: Node): Node = {
+      if (path.isEmpty) {
+        pathInts.add(0)
+      } else {
+        pathInts.add(path.get(path.size()- 1).nodes.indexOf(parentNode))
+      }
       path.add(parentNode)
+
       if (parentNode.nodes != null) {
         val matchOption: Option[Node] = parentNode.nodes.filter((n: Node) => n == node).lastOption
         if (matchOption.nonEmpty)
@@ -183,11 +191,17 @@ class MainVm {
       Messagebox.show("Can't delete root node")
     } else {
       // todo : confirm
+      val index: Int = parentNode.nodes.indexOf(currentItemVm)
       parentNode.nodes = parentNode.nodes.filter(_ != currentItemVm)
-      //currentItemVm = null
       BindUtils.postNotifyChange(null, null, this, "treeVm")
-      //treeVm.fireEvent(TreeDataEvent.STRUCTURE_CHANGED, 0, 0, 0)
-      //BindUtils.postNotifyChange(null, null, this, "currentItemVm")
+      val ints: Array[Int] = new Array[Int](pathInts.size())
+      for ( i <- 0 to pathInts.size() - 1) {
+        ints(i) = pathInts.get(i)
+      }
+      treeVm.fireEvent(TreeDataEvent.INTERVAL_REMOVED,
+        ints,
+        index,
+        index)
     }
   }
 }
