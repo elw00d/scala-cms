@@ -9,6 +9,9 @@ import org.zkoss.zul.ext.TreeSelectableModel
 import scala.io.{Source, BufferedSource}
 
 /**
+ * Чтобы ещё улучшить дерево, можно попробовать способ отсюда:
+ * http://zkfiddle.org/sample/3ug0j45/1-Add-condition-to-drop-action
+ *
 * @author igor.kostromin
 *         08.08.2014 11:39
 */
@@ -18,22 +21,11 @@ class TreeVm(var root: Node) extends AbstractTreeModel[Node](root) {
   }
 
   override def getChild(parent: Node, index: Int): Node = {
-    //try {
       parent.nodes(index)
-//    } catch {
-//      case e: ArrayIndexOutOfBoundsException => {
-//        System.out.println("ArrayIndexOutOfBoundsException")
-//        return null
-//      }
-//    }
   }
 
   override def getChildCount(parent: Node): Int = {
     if (parent.nodes == null) 0
     else parent.nodes.size
   }
-
-//  override def getIndexOfChild(parent: Node, child: Node): Int = {
-//    0
-//  }
 }
