@@ -159,29 +159,38 @@ class MainVm {
 
   @Command(Array("drop"))
   def drop(@BindingParam("event") event: Event) = {
-    System.out.println("drop command")
-    // The dragged target is a TreeRow belongs to an
-    // Treechildren of TreeItem.
     val draggedItem: Treeitem = event.asInstanceOf[DropEvent].getDragged.getParent.asInstanceOf[Treeitem]
     val draggedNode: Node = draggedItem.getValue[Node]
     val parentItem: Treeitem = event.getTarget.getParent.asInstanceOf[Treeitem]
     val parentResult: (Node, Array[Int]) = getParentNode(treeVm.root, draggedNode)
     val oldParent: Node = parentResult._1
 
+    // Уведомляем дерево об удалении элемента - для перерисовки без полного обновления байндинга treeVm
     val index: Int = oldParent.nodes.indexOf(draggedNode)
     oldParent.nodes = oldParent.nodes.filter(_ != draggedNode)
     treeVm.fireEvent(oldParent, index, index, TreeDataEvent.INTERVAL_REMOVED)
 
+    // Уведомляем дерево о том, что родительская нода стала пустой (чтобы убралась открытая стрелочка)
+    if (oldParent.nodes.length == 0) {
+      val parentParentResult: (Node, Array[Int]) = getParentNode(treeVm.root, oldParent)
+
+      treeVm.fireEvent(parentParentResult._1,
+        parentParentResult._1.nodes.indexOf(oldParent),
+        parentParentResult._1.nodes.indexOf(oldParent),
+        TreeDataEvent.STRUCTURE_CHANGED)
+    }
+
+    // Уведомляем дерево о том, что был добавлен элемент
     val node: Node = parentItem.getValue[Node]
     if (node.nodes == null)
       node.nodes = Array()
     node.nodes +:= draggedNode
     treeVm.fireEvent(node, 0, 0, TreeDataEvent.INTERVAL_ADDED)
 
+    // Обновляем выделенный элемент (само дерево почему-то не понимает этого)
     val list: util.ArrayList[Node] = new util.ArrayList[Node]()
     list.add(draggedNode)
     treeVm.setSelection(list)
-    //BindUtils.postNotifyChange(null, null, this, "treeVm")
   }
 
   def getParentNode(parentNode: Node, node: Node): (Node, Array[Int]) = {
