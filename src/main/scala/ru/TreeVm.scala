@@ -29,7 +29,8 @@ class TreeVm(var root: Node) extends AbstractTreeModel[Node](root) {
   }
 
   override def getChildCount(parent: Node): Int = {
-    parent.nodes.size
+    if (parent.nodes == null) 0
+    else parent.nodes.size
   }
 
 //  override def getIndexOfChild(parent: Node, child: Node): Int = {
