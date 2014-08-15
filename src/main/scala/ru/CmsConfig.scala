@@ -71,4 +71,5 @@ class Template(@BeanProperty var id: String,
                 @BeanProperty var baseTemplate: String,
                 @BeanProperty var regions: java.util.HashMap[String, String],
                 @BeanProperty var attributes: java.util.HashMap[String, Object]) {
+  override def toString: String = id
 }
