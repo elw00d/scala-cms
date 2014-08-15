@@ -1,7 +1,7 @@
 <window xmlns="http://www.zkoss.org/2005/zul"
         title="Scala CMS" border="normal"
         apply="org.zkoss.bind.BindComposer"
-        viewModel="@id('mainVm') @init('ru.MainVm')"
+        viewModel="@id('vm') @init('ru.TemplatesVm')"
         id="win" height="100%">
     <panel border="normal" height="100%" >
         <panelchildren>
@@ -36,12 +36,22 @@
                 </hbox>
                 <hbox height="100%" widths="25%,">
                     <vbox width="100%" height="100%">
-                        <tree id="tree" model="@load(mainVm.treeVm)" selectedItem="@save(mainVm.currentItemVm)">
+                        <listbox model="@bind(vm.templatesVm)">
+                            <listhead>
+                                <listheader label="Templates" sort="auto" />
+                            </listhead>
+                            <template name="model">
+                                <listitem draggable="true" droppable="true">
+                                    <listcell label="${each}"/>
+                                </listitem>
+                            </template>
+                        </listbox>
+                        <!--<tree id="tree" model="@load(mainVm.treeVm)" selectedItem="@save(mainVm.currentItemVm)">
                             <template name="model">
                                 <treeitem context="treePopup">
                                     <treerow onDrop="@command('drop', event=event)" draggable="true" droppable="true">
                                         <treecell label="${each.toString()}">
-                                            <!--<image src="/widgets/menu/context_menu/img/msn2.gif" />-->
+                                            &lt;!&ndash;<image src="/widgets/menu/context_menu/img/msn2.gif" />&ndash;&gt;
                                         </treecell>
                                     </treerow>
                                 </treeitem>
@@ -52,10 +62,10 @@
                             <menuitem onClick="@command('edit')" label="Edit" />
                             <menuseparator />
                             <menuitem onClick="@command('delete')" label="Delete" />
-                        </menupopup>
+                        </menupopup>-->
                     </vbox>
                     <splitter id="s2" collapse="before" />
-                    <include vm="@ref(mainVm.currentItemVmVm)" src="node-edit.zul"/>
+                    <!--<include vm="@ref(mainVm.currentItemVmVm)" src="node-edit.zul"/>-->
                 </hbox>
                 <splitter collapse="after"/>
                 <hbox>
