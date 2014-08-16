@@ -24,22 +24,47 @@ import scala.io.{Source, BufferedSource}
  */
 class NodeVm {
   @BeanProperty var node : Node = null
+  @BeanProperty var availableTemplates: Array[Template] = null
 
-  @Init
-  def init(@ExecutionArgParam("node") node: Node) = {
-    System.out.println("Node: " + node)
-    this.node = node
+  var selectedTemplate: Template = null
+  def getSelectedTemplate: Template = selectedTemplate
+  def setSelectedTemplate(value: Template) = {
+    selectedTemplate = value
+    BindUtils.postNotifyChange(null, null, this, "changed")
   }
 
-  def this(node: Node) {
+  var urlPrefix: String = null
+  def getUrlPrefix: String = urlPrefix
+  def setUrlPrefix(value: String) = {
+    urlPrefix = value
+    BindUtils.postNotifyChange(null, null, this, "changed")
+  }
+
+//  @Init
+//  def init(@ExecutionArgParam("node") node: Node) = {
+//    System.out.println("Node: " + node)
+//    this.node = node
+//  }
+
+  def this(node: Node, availableTemplates: Array[Template]) {
     this()
     this.node = node
+    this.availableTemplates = availableTemplates
+    this.selectedTemplate = availableTemplates.find(_.id == node.template).orNull
+    this.urlPrefix = node.urlPrefix
   }
 
-  @Command(Array("submit"))
-  def submit() = {
-    System.out.println("NodeVm.submit()")
+  def isChanged(): Boolean = {
+    if (node == null) return false
+    (availableTemplates.find(_.id == node.template).orNull != this.selectedTemplate
+    ||
+    this.urlPrefix != node.urlPrefix)
   }
+
+//  @Command(Array("submit"))
+//  def submit() = {
+//    System.out.println("NodeVm.submit()")
+//  }
 }
 
 class MainVm {
@@ -58,7 +83,7 @@ class MainVm {
   def getCurrentItemVm: Node = currentItemVm
   def setCurrentItemVm(node: Node): Unit = {
     currentItemVm = node
-    currentItemVmVm = new NodeVm(node)
+    currentItemVmVm = new NodeVm(node, cmsConfig.templates)
     BindUtils.postNotifyChange(null, null, this, "currentItemVmVm")
     BindUtils.postNotifyChange(null, null, this, "canExecute")
   }
@@ -72,9 +97,9 @@ class MainVm {
 		Selectors.wireComponents(view, this, false)
 	}
 
-  loadFromFile()
+  val cmsConfig = loadFromFile()
   
-  def loadFromFile() = {
+  def loadFromFile() : CmsConfig = {
     val basedir: String = System.getProperty("cms.basedir")
     val file: BufferedSource = Source.fromFile(new File(basedir, "config_v2.json"))
     val content: String = file.mkString
@@ -83,13 +108,15 @@ class MainVm {
 
     val rootNode: Node = new Node(null, null, Array(cmsConfig.rootNode), null, null)
     treeVm = new TreeVm(rootNode)
+
+    cmsConfig
   }
 
   @Command(Array("add"))
   def add() {
     System.out.println("Add command")
     val dataArgs: util.HashMap[String, Object] = new util.HashMap[String, Object]()
-    newItemVm = new NodeVm(new Node("", "", Array(), new util.HashMap[String, Object](), Array()))
+    newItemVm = new NodeVm(new Node("", "", Array(), new util.HashMap[String, Object](), Array()), cmsConfig.templates)
     dataArgs.put("nodeVm", newItemVm)
     dataArgs.put("title", "Add node")
     val dlg = Executions.createComponents("/dialog.zul", win, dataArgs).asInstanceOf[Window]
@@ -133,6 +160,13 @@ class MainVm {
 
   @Command(Array("submit"))
   def submit() = {
+    if (currentItemVmVm.isChanged()) {
+      // todo : наверное, имеет смысл перенести сей код во вложенную ViewModel ?
+      currentItemVmVm.node.urlPrefix = currentItemVmVm.urlPrefix
+      currentItemVmVm.node.template = currentItemVmVm.selectedTemplate.id
+      BindUtils.postNotifyChange(null, null, currentItemVmVm, "changed")
+    }
+
     // Обновляем представление изменённого узла в дереве
     BindUtils.postNotifyChange(null, null, this, "treeVm")
   }
