@@ -5,19 +5,23 @@
         <column label="Type" width="120px" />
         <!--<column label="Content"/>-->
         <!--form="@id('fx') @load(vm.node) @save(vm.node, before='submit')"-->
-        <column label="@load(fxStatus.dirty?'Content *':'Content')" />
+        <column label="@load(vm.changed?'Content *':'Content')" />
     </columns>
     <rows>
         <row>
             <label value="Url prefix" width="150px" />
             <hlayout>
-                <textbox value="@bind(fx.urlPrefix)" width="150px" />
+                <textbox value="@bind(vm.urlPrefix)" width="150px" />
             </hlayout>
         </row>
         <row>
             <label value="Template" width="150px" />
             <hlayout>
-                <textbox value="@bind(fx.template)" width="150px" />
+                <!--<textbox value="@bind(fx.template)" width="150px" />-->
+                <combobox
+                        model="@load(vm.availableTemplates)"
+                        selectedItem="@bind(vm.selectedTemplate)">
+                </combobox>
             </hlayout>
         </row>
         <row>
