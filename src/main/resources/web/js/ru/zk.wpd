@@ -1,8 +1,0 @@
-<package name="ru" language="xul/html">
-    <widget name="AceEditorComponent"/>
-    <script src="jquery-1.10.2.min.js"/>
-    <script src="ace-editor/ace.js"/>
-    <script src="ace-editor/mode-ftl.js"/>
-    <script src="ace-editor/mode-java.js"/>
-    <script src="ace-editor/theme-github.js"/>
-</package>

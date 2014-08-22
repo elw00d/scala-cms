@@ -7,8 +7,8 @@
 
     <component>
         <component-name>AceEditorComponent</component-name>
-        <component-class>ru.AceEditorComponent</component-class>
-        <widget-class>ru.AceEditorComponent</widget-class>
+        <component-class>ru.ace.AceEditorComponent</component-class>
+        <widget-class>ru.ace.AceEditorComponent</widget-class>
         <mold>
             <mold-name>default</mold-name>
             <mold-uri>mold/AceEditorComponent.js</mold-uri>
