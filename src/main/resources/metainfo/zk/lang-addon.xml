@@ -2,6 +2,9 @@
     <addon-name>AceEditorComponent</addon-name>
     <language-name>xul/html</language-name>
 
+    <!--<javascript package="ace-editor"></javascript>-->
+    <!--<javascript src="~./web/js/ru/jquery-1.10.2.min.js"></javascript>-->
+
     <component>
         <component-name>AceEditorComponent</component-name>
         <component-class>ru.AceEditorComponent</component-class>
