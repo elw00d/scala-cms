@@ -2,7 +2,10 @@
     <addon-name>AceEditorComponent</addon-name>
     <language-name>xul/html</language-name>
 
-    <!--<javascript package="ace-editor"></javascript>-->
+    <!--<javascript src="~/web/js/ru/ace/AceEditorComponent.js"/>-->
+    <!--<javascript src="ace-editor/mode-ftl.js"/>-->
+    <!--<javascript src="ace-editor/mode-java.js"/>-->
+    <!--<javascript src="ace-editor/theme-github.js"/>-->
     <!--<javascript src="~./web/js/ru/jquery-1.10.2.min.js"></javascript>-->
 
     <component>

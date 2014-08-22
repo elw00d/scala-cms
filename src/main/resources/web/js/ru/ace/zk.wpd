@@ -1,6 +1,8 @@
 <package name="ru.ace" language="xul/html">
     <widget name="AceEditorComponent"/>
-    <script src="jquery-1.10.2.min.js"/>
+
+    <!-- Будут загружены как 1 файл ru.ace.wpd и только тогда
+      компонент будет использоваться -->
     <script src="ace-editor/ace.js"/>
     <script src="ace-editor/mode-ftl.js"/>
     <script src="ace-editor/mode-java.js"/>
