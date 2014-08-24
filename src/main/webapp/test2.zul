@@ -1,3 +1,4 @@
-<zk>
-    <AceEditorComponent value="GOGOGO"></AceEditorComponent>
+<zk viewModel="@id('vm') @init('ru.ace.AceEditorTestVm)"
+        apply="org.zkoss.bind.BindComposer">
+    <AceEditorComponent value="@bind(vm.text)"/>
 </zk>
