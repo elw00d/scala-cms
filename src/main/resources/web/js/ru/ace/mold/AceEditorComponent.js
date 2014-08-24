@@ -14,6 +14,12 @@ function _(out) {
         editor.setSelectionStyle('text'); // instead of default "line"
         // store configured instance
         $('#editor').data('editor', editor);
+
+        var self = this;
+        editor.on("blur", function() {
+            //alert(editor.getValue());
+            self.setValue(editor.getValue());
+        });
     };
 
     // doesn't work
