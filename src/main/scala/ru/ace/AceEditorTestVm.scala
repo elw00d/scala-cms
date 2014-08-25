@@ -1,8 +1,7 @@
 package ru.ace
 
 import org.zkoss.bind.BindUtils
-
-import scala.beans.BeanProperty
+import org.zkoss.zul.Messagebox
 
 /**
  * @author igor.kostromin
@@ -17,6 +16,7 @@ class AceEditorTestVm {
 
   def setText(text: String) = {
     this.text = text
+    Messagebox.show("Changed text: " + text)
     BindUtils.postNotifyChange(null, null, this, "text")
   }
 

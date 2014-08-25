@@ -15,10 +15,12 @@ function _(out) {
         // store configured instance
         $('#editor').data('editor', editor);
 
+        this._editor = editor;
+
         var self = this;
         editor.on("blur", function() {
-            //alert(editor.getValue());
             self.setValue(editor.getValue());
+            self.fire('onChange', {text: editor.getValue()}, {toServer: true})
         });
     };
 
