@@ -8,8 +8,8 @@ ru.ace.AceEditorComponent = zk.$extends(zk.Widget, {
     setValue : function(value) {
         if (this._value != value) {
             this._value = value;
-            if (this.desktop)
-                this.$n().innerHTML = zUtl.encodeXML(value);
+            //if (this.desktop)
+            //    this._editor.getSession().setValue(zUtl.encodeXML(value));
         }
     }
 

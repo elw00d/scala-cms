@@ -27,7 +27,7 @@
             </attribute>
             <attribute>
                 <attribute-name>SAVE_EVENT</attribute-name>
-                <attribute-value>onChange</attribute-value>
+                <attribute-value>onChanged</attribute-value>
             </attribute>
         </annotation>
     </component>
